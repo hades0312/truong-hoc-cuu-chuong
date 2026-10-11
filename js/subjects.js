@@ -12,7 +12,8 @@
   var LIST = [
     { id: 'math', name: 'Toán lớp 4', icon: '🔢', teacher: 'hang', tname: 'Cô Hằng' },
     { id: 'science', name: 'Khoa học', icon: '🔬', teacher: 'nam', tname: 'Thầy Nam' },
-    { id: 'english', name: 'Tiếng Anh', icon: '🔤', teacher: 'lan', tname: 'Cô Lan' }
+    { id: 'english', name: 'Tiếng Anh', icon: '🔤', teacher: 'lan', tname: 'Cô Lan' },
+    { id: 'life', name: 'Kỹ năng sống', icon: '🚦', teacher: 'hang', tname: 'Cô Hằng' } // mỗi chủ đề có thầy cô riêng (xem bank-life.js)
   ];
   var PER_MISSION = 6;
 
@@ -134,8 +135,8 @@
       cur = { q: q, it: it, attempt: 0, usedHint: false, locked: false, solved: false, choices: shuffle([it.a].concat(it.wrong)) };
       renderProgress();
       stage.innerHTML = '';
-      stage.appendChild(h('div', { class: 'stage-npc' }, [h('div', { class: 'stage-avatar', html: A.adultSVG(sub.teacher) }),
-        h('div', { class: 'bubble', text: sub.tname + ': ' + q.topic.name + '. Câu ' + Math.min(state.correct + 1, total) + '/' + total + '.' })]));
+      stage.appendChild(h('div', { class: 'stage-npc' }, [h('div', { class: 'stage-avatar', html: A.adultSVG(q.topic.teacher || sub.teacher) }),
+        h('div', { class: 'bubble', text: (q.topic.tname || sub.tname) + ': ' + q.topic.name + '. Câu ' + Math.min(state.correct + 1, total) + '/' + total + '.' })]));
       // Chỉ hiện hình của chính câu hỏi; không có thì hiện biểu tượng môn (hình của chủ đề có thể làm bé hiểu nhầm đáp án)
       stage.appendChild(h('div', { class: 'subj-pic' + (it.pic ? '' : ' plain'), 'aria-hidden': 'true', text: it.pic || sub.icon }));
       renderPanel();

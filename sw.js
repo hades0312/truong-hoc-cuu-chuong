@@ -1,10 +1,10 @@
 /* Service worker: lưu sẵn toàn bộ game để mở offline sau lần tải đầu, và tự cập nhật khi có bản mới.
  * MỖI LẦN ĐƯA BẢN MỚI LÊN: tăng số trong CACHE ở đây và số ?v= trong index.html. */
-var CACHE = 'tientien-v10';
+var CACHE = 'tientien-v11';
 var ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './js/engine.js', './js/storage.js', './js/audio.js', './js/art.js', './js/ui.js', './js/external.js', './js/install.js', './js/visual.js',
-  './js/quiz.js', './js/bank-math.js', './js/bank-science.js', './js/bank-english.js', './js/subjects.js',
+  './js/quiz.js', './js/bank-math.js', './js/bank-science.js', './js/bank-english.js', './js/bank-life.js', './js/subjects.js', './js/tour.js',
   './js/activities.js', './js/world.js', './js/parent.js', './js/app.js',
   './img/tranh-mac-dinh.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'

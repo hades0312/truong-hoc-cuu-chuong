@@ -79,6 +79,7 @@
         data.sound = data.sound === false; S.save(); TT.audio.setEnabled(data.sound); renderTitle();
       }),
       U.iconBtn('fullscreen', 'Toàn màn hình', toggleFullscreen),
+      btn(h('span', { html: A.icon('hint') + '<span>Hướng dẫn</span>' }), 'pill', guide, { id: 'btn-guide', 'aria-label': 'Hướng dẫn chơi' }),
       TT.install.button('pill'), // ẩn khi game đã chạy như một ứng dụng
       btn(h('span', { html: A.icon('parent') + '<span>Ba mẹ</span>' }), 'pill', function () { TT.parent.gate(function () { openParent('title'); }); })
     ]);
@@ -122,8 +123,9 @@
     S.setActive(id);
     var p = S.profile();
     applyProfileSettings();
+    app.viaRoad = true; // vào từ cổng game: đi qua đường tới trường trước
     if (!p.setupDone) return renderSetup();
-    enterSchool();
+    enterRoad();
   }
 
   /* ---------------- Tạo/sửa nhân vật: tên, ngoại hình, thú đồng hành ----------------
@@ -205,7 +207,8 @@
         }
         p.look = draft.look; p.pet = draft.pet; p.setupDone = true;
         if (create) { S.addProfile(p); app.selected = p.id; }
-        S.save(); enterSchool();
+        S.save();
+        if (app.viaRoad) enterRoad(); else enterSchool();
       }, { id: 'btn-setup-done' })
     ]));
     wrap.appendChild(preview); wrap.appendChild(form);
@@ -216,7 +219,31 @@
 
   /* ---------------- Sân trường và lớp học ---------------- */
   function buildWorld(at, resume) {
-    TT.world.build($('map'), { scene: app.scene, at: at, resume: resume, onZone: openZone, onNpc: talkNpc });
+    TT.world.build($('map'), { scene: app.scene, at: at, resume: resume, onZone: openZone, onNpc: talkNpc, onEvent: worldEvent });
+  }
+
+  /* Sang đường đúng luật (chờ đèn xanh, đi trên vạch): lần đầu mỗi ngày được thưởng một ngôi sao */
+  function worldEvent(name) {
+    if (name !== 'crossed') return;
+    var p = S.profile(), day = S.today(p);
+    if (day.crossed) return U.toast('Con sang đường rất đúng luật!');
+    day.crossed = true; p.stars += 1; S.save();
+    TT.audio.play('reward');
+    renderHud();
+    U.toast('Con chờ đèn xanh và đi trên vạch kẻ đường: thưởng 1 ngôi sao!', 4200);
+  }
+
+  /* Đường tới trường: bé đi từ nhà, qua làng quê, chờ đèn xanh sang đường rồi mới vào cổng trường */
+  function enterRoad() {
+    var p = S.profile();
+    S.rollClassmates(p);
+    p.lastPlayed = Date.now(); S.save();
+    applyProfileSettings();
+    app.scene = 'road'; app.sessionMs = 0;
+    show('school');
+    renderHud(); renderQuickbar();
+    buildWorld();
+    setTimeout(function () { if (app.scene === 'road') TT.world.greet('Mình đi học thôi! Đi dọc vỉa hè tới vạch sang đường nhé.'); }, 600);
   }
 
   function enterSchool(skipGreeting) {
@@ -244,8 +271,8 @@
     }
   }
 
-  function changeScene(scene, at, after) {
-    TT.audio.play('door');
+  function changeScene(scene, at, after, sfx) {
+    TT.audio.play(sfx || 'door');
     fade(function () {
       if (app.currentRun) { app.currentRun.destroy(); app.currentRun = null; }
       app.scene = scene;
@@ -268,7 +295,7 @@
     var p = S.profile();
     var hud = $('hud');
     hud.innerHTML = '';
-    var me = btn(h('span', { class: 'me', html: '<span class="me-av">' + A.girlSVG(p.look) + '</span><span class="me-txt"><b>' + escapeHtml(charName()) + '</b>' + (p.nickname !== p.name ? '<small>' + escapeHtml(p.nickname) + '</small>' : '') + '</span>' }), 'me-btn', function () { renderSetup(); }, { 'aria-label': 'Đổi trang phục của ' + charName() });
+    var me = btn(h('span', { class: 'me', html: '<span class="me-av">' + A.girlSVG(p.look) + '</span><span class="me-txt"><b>' + escapeHtml(charName()) + '</b>' + (p.nickname !== p.name ? '<small>' + escapeHtml(p.nickname) + '</small>' : '') + '</span>' }), 'me-btn', function () { app.viaRoad = false; renderSetup(); }, { 'aria-label': 'Đổi trang phục của ' + charName() });
     hud.appendChild(me);
     hud.appendChild(h('span', { class: 'pill stars', 'aria-label': p.stars + ' ngôi sao', html: A.obj('star') + '<b id="star-count">' + p.stars + '</b>' }));
     hud.appendChild(h('span', { class: 'pill treats', 'aria-label': p.treats + ' bánh thưởng cho thú', html: A.icon('treat') + '<b>' + p.treats + '</b>' }));
@@ -307,6 +334,12 @@
   function quickEntries() {
     var p = S.profile(), list = [];
     function add(id, icon, name, fn) { list.push({ id: id, icon: icon, name: name, fn: fn }); }
+    if (app.scene === 'road') {
+      add('rd-gate', 'classroom', 'Vào trường', function () { openZone('rd-gate'); });
+      add('traffic', 'walk', 'An toàn giao thông', function () { startSubject('life', 'giaothong'); });
+      add('guide', 'hint', 'Hướng dẫn chơi', guide);
+      return list;
+    }
     add('subjects', 'book', 'Môn học', subjectMenu);
     if (app.scene === 'classroom') {
       add('cls-desk', 'desk', 'Luyện cùng cô Hằng', function () { openZone('cls-desk'); });
@@ -317,7 +350,9 @@
       });
     }
     add('review', 'review', 'Ôn lại', function () { startMission('review'); });
+    add('tour', 'map', 'Tham quan trường', startTour);
     if (app.scene === 'classroom') add('cls-door', 'door', 'Ra sân', leaveRoom);
+    add('guide', 'hint', 'Hướng dẫn chơi', guide);
     return list;
   }
 
@@ -339,6 +374,11 @@
       actions.push({ label: 'Nhiệm vụ hôm nay', cls: 'secondary', fn: function () { openZone('board'); } });
     }
     if (n.id === 'hoa') actions.push({ label: 'Vào thư viện', fn: function () { openZone('library'); } });
+    if (n.id === 'congan') actions.push({ label: 'Học an toàn giao thông', fn: function () { startSubject('life', 'giaothong'); } });
+    if (n.id === 'tam') {
+      actions.push({ label: 'Học ăn uống an toàn', fn: function () { startSubject('life', 'anuong'); } });
+      if (p.settings.division) actions.push({ label: 'Chia phần bánh', cls: 'secondary', fn: function () { startMission('canteen'); } });
+    }
     if (n.id === 'k1') actions.push({ label: 'Chuyền bóng', fn: function () { openZone('sports'); } });
     if (n.id === 'k0') actions.push({ label: 'Thu hoạch ở vườn', fn: function () { openZone('garden'); } });
     U.say(name, avatar, line, actions);
@@ -383,8 +423,15 @@
       case 'library': return startMission('library');
       case 'garden': return startMission('garden');
       case 'sports': return startMission('sports');
-      case 'canteen': if (p.settings.division) return startMission('canteen'); return;
-      case 'art': return openAct('Phòng Mỹ thuật', function (body) { TT.act.art(body, { onChange: refreshCounters, onIsland: function () { openZone('portal'); } }); }, 'island');
+      case 'canteen': return canteenMenu();
+      case 'tour': return startTour();
+      case 'rd-gate': TT.audio.play('whoosh'); return fade(function () { enterSchool(); });
+      case 'road': return changeScene('road', { x: 2250, y: 650 }, null, 'whoosh');
+      case 'studio': return openAct('Tô màu nhân vật', function (body) {
+        TT.act.studio(body, { onChange: function () { refreshCounters(); TT.world.destroy(); }, onDone: closeAct });
+      }, 'yard');
+      case 'art': return artMenu();
+      case 'decor': return openAct('Phòng Mỹ thuật: trang trí đảo', function (body) { TT.act.art(body, { onChange: refreshCounters, onIsland: function () { openZone('portal'); } }); }, 'island');
       case 'pets': return openAct('Góc thú cưng', function (body) {
         TT.act.pets(body, { onChange: function () { refreshCounters(); TT.world.destroy(); }, onMission: function (t) { startMission(t); } });
       }, 'pets');
@@ -395,7 +442,7 @@
         });
       }, 'yard', true);
       case 'portal': return openAct('Đảo thú cưng', function (body) {
-        TT.act.island(body, { onMission: function (t) { startMission(t); }, onArt: function () { openZone('art'); } });
+        TT.act.island(body, { onMission: function (t) { startMission(t); }, onArt: function () { openZone('decor'); } });
       }, 'island');
     }
   }
@@ -502,13 +549,78 @@
   /* Bảng 5 điều Bác Hồ dạy treo trong lớp */
   function fiveTeachings() {
     var lines = ['Yêu Tổ quốc, yêu đồng bào', 'Học tập tốt, lao động tốt', 'Đoàn kết tốt, kỷ luật tốt', 'Giữ gìn vệ sinh thật tốt', 'Khiêm tốn, thật thà, dũng cảm'];
-    var ol = h('ol');
-    lines.forEach(function (t) { ol.appendChild(h('li', { text: t })); });
+    var ol = h('ol', { class: 'five-list' });
+    lines.forEach(function (t, i) { ol.appendChild(h('li', {}, [h('span', { class: 'five-n', text: String(i + 1) }), h('span', { text: t })])); });
+    var board = h('div', { class: 'five-board' }, [
+      h('div', { class: 'five-star', 'aria-hidden': 'true', html: A.obj('star') }),
+      h('h2', { text: '5 điều Bác Hồ dạy' }),
+      h('p', { class: 'five-sub', text: 'thiếu niên, nhi đồng' }),
+      ol
+    ]);
     var row = h('div', { class: 'row-actions' });
     if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak('Năm điều Bác Hồ dạy. ' + lines.map(function (t, i) { return 'Điều ' + (i + 1) + '. ' + t; }).join('. ') + '.'); }));
     row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
-    U.modal(h('div', { class: 'five' }, [h('h2', { text: '5 điều Bác Hồ dạy' }), ol, row]), { cls: 'wide' });
+    U.modal(h('div', { class: 'five' }, [board, row]), { cls: 'wide' });
   }
+
+  /* Hai bảng chọn nhỏ: Phòng Mỹ thuật và Nhà ăn */
+  function choiceMenu(title, cards) {
+    var grid = h('div', { class: 'subj-grid two' });
+    cards.forEach(function (c) {
+      grid.appendChild(btn(h('span', {}, [h('span', { class: 'em', text: c.em }), h('b', { text: c.name }), h('small', { text: c.note })]), 'subj-card', function () { U.closeModal(); c.fn(); }, { 'data-pick': c.id }));
+    });
+    U.modal(h('div', { class: 'subj-menu' }, [h('h2', { text: title }), grid, h('div', { class: 'row-actions' }, [btn('Để sau', 'ghost', U.closeModal)])]), { cls: 'wide' });
+  }
+  function artMenu() {
+    choiceMenu('Phòng Mỹ thuật', [
+      { id: 'studio', em: '🎨', name: 'Tô màu nhân vật', note: 'tóc, áo, váy, giày theo ý con', fn: function () { openZone('studio'); } },
+      { id: 'decor', em: '🏝️', name: 'Trang trí đảo', note: 'đổi ngôi sao lấy đồ trang trí', fn: function () { openZone('decor'); } }
+    ]);
+  }
+  function canteenMenu() {
+    var cards = [{ id: 'food', em: '🥗', name: 'Ăn uống an toàn', note: 'cùng cô Tâm chọn món sạch, lành', fn: function () { startSubject('life', 'anuong'); } }];
+    if (S.profile().settings.division) cards.push({ id: 'div', em: '🍪', name: 'Chia phần bánh', note: 'luyện phép chia', fn: function () { startMission('canteen'); } });
+    if (cards.length === 1) return cards[0].fn();
+    choiceMenu('Nhà ăn', cards);
+  }
+
+  /* ---------------- Tham quan trường (tour.js) ----------------
+   * Cô giáo dẫn bé đi lần lượt qua các nơi trong sân trường; tới mỗi nơi cô kể vài câu. Cuối cùng là phần quê hương em. */
+  function startTour() {
+    if (app.scene !== 'yard' || !TT.world.state || app.screen !== 'school') {
+      return changeScene('yard', { x: 1250, y: 1380 }, function () { setTimeout(startTour, 500); }, 'whoosh');
+    }
+    var T = TT.tour, i = -1;
+    function next() {
+      i++;
+      if (app.scene !== 'yard' || !TT.world.state) return;
+      if (i >= T.STOPS.length) return hometown();
+      var s = T.STOPS[i], shown = false;
+      var tell = function () {
+        if (shown || app.scene !== 'yard' || app.screen !== 'school') return;
+        shown = true;
+        U.say(T.GUIDE.name, A.adultSVG(T.GUIDE.art), s.text, [{ label: i < T.STOPS.length - 1 ? 'Đi tiếp' : 'Kể về quê hương em', fn: next }]);
+      };
+      U.toast('Tham quan trường · điểm ' + (i + 1) + '/' + T.STOPS.length + ': ' + s.title, 2600);
+      TT.world.walkTo(s.x, s.y, tell);
+      setTimeout(tell, 14000); // bé tự đi chỗ khác giữa chừng thì cô vẫn kể tiếp
+    }
+    next();
+  }
+  /* Phần cuối chuyến tham quan: quê hương em và thông tin về trường (nếu ba mẹ đã bổ sung trong tour.js) */
+  function hometown() {
+    var T = TT.tour, lines = T.SCHOOL.concat(T.HOME);
+    var ul = h('ul', { class: 'home-list' });
+    lines.forEach(function (t) { ul.appendChild(h('li', { text: t })); });
+    var row = h('div', { class: 'row-actions wrap' });
+    if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak(lines.join(' ')); }));
+    row.appendChild(btn('Đố vui về trường em', 'secondary', function () { U.closeModal(); startSubject('life', 'truongem'); }, { id: 'btn-tour-quiz' }));
+    row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
+    U.modal(h('div', { class: 'home-box' }, [h('h2', { text: 'Trường em, quê em' }), ul, row]), { cls: 'wide' });
+  }
+
+  /* Trang hướng dẫn chơi cho bé */
+  function guide() { U.modal(TT.act.guide({ onClose: U.closeModal }), { cls: 'wide guide-modal' }); }
 
   var MISSION_TITLES = {
     warmup: 'Làm quen với lớp học', classroom: 'Luyện cùng cô Hằng', feed: 'Cho thú ăn', bridge: 'Xây cầu sang đảo',
@@ -625,10 +737,10 @@
     if (breakTime) {
       box.appendChild(h('p', { class: 'muted', text: 'Mình nghỉ một chút cho mắt và tay nhé. Thú cưng vẫn vui vẻ chờ con quay lại.' }));
       acts.appendChild(btn('Nghỉ thôi', 'primary big', function () { app.sessionMs = 0; TT.world.destroy(); show('title'); renderTitle(); }, { id: 'btn-rest' }));
-      acts.appendChild(btn('Trang trí đảo một chút', 'secondary', function () { openZone('art'); }));
+      acts.appendChild(btn('Trang trí đảo một chút', 'secondary', function () { openZone('decor'); }));
       acts.appendChild(btn(backLabel(), 'ghost', closeAct));
     } else {
-      acts.appendChild(btn('Trang trí đảo', 'secondary', function () { openZone('art'); }, { id: 'btn-decorate' }));
+      acts.appendChild(btn('Trang trí đảo', 'secondary', function () { openZone('decor'); }, { id: 'btn-decorate' }));
       acts.appendChild(btn('Nghỉ một chút', 'ghost', function () { app.sessionMs = 0; TT.world.destroy(); show('title'); renderTitle(); }));
       if (theme !== 'warmup') acts.appendChild(btn('Chơi tiếp', 'primary', function () { if (opts.again) opts.again(); else startMission(theme, { tables: opts.tables }); }, { id: 'btn-again' }));
       acts.appendChild(btn(backLabel(), theme === 'warmup' ? 'primary' : 'ghost', closeAct, { id: 'btn-to-school' }));
@@ -749,7 +861,7 @@
     }
   };
 
-  app.subjectMenu = subjectMenu; app.startSubject = startSubject;
+  app.subjectMenu = subjectMenu; app.startSubject = startSubject; app.guide = guide; app.enterRoad = enterRoad; app.startTour = startTour;
   app.openZone = openZone; app.startMission = startMission; app.enterAs = enterAs; app.toggleFullscreen = toggleFullscreen;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(window);

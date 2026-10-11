@@ -425,23 +425,128 @@
     render();
   }
 
+  /* =================== PHÒNG MỸ THUẬT: TÔ MÀU NHÂN VẬT ===================
+   * Bé tô tóc, áo, váy/quần, giày, ba lô theo ý mình. Màu đầu tiên của mỗi hàng là màu đồng phục. */
+  var PALETTE = {
+    hc: [['', 'Đen nâu', '#3d2b2b'], ['#1f1f2e', 'Đen'], ['#6b4226', 'Nâu'], ['#a0522d', 'Hạt dẻ'], ['#c98a3b', 'Vàng nâu'], ['#e76f8a', 'Hồng'], ['#7b4bb7', 'Tím'], ['#2a9d8f', 'Xanh ngọc']],
+    sh: [['', 'Trắng', '#ffffff'], ['#ffe5ec', 'Hồng phấn'], ['#e0f2ff', 'Xanh trời'], ['#fff3c4', 'Vàng kem'], ['#d8f3dc', 'Xanh bạc hà'], ['#ead7ff', 'Tím nhạt']],
+    sk: [['', 'Xanh đồng phục', '#33508f'], ['#c1121f', 'Đỏ'], ['#7b4bb7', 'Tím'], ['#2a9d8f', 'Xanh ngọc'], ['#e76f8a', 'Hồng'], ['#3a3a4a', 'Đen']],
+    so: [['', 'Tím than', '#5b4a8a'], ['#2b2f3a', 'Đen'], ['#f8f9fa', 'Trắng'], ['#e63946', 'Đỏ'], ['#4dabf7', 'Xanh'], ['#ff9f1c', 'Cam']],
+    bag: [['#ff8fab', 'Hồng'], ['#7cc6fe', 'Xanh trời'], ['#ffd166', 'Vàng'], ['#95d5b2', 'Xanh lá'], ['#b8a1ff', 'Tím'], ['#ff9f1c', 'Cam']]
+  };
+  function studio(container, opts) {
+    init();
+    var p = P(), look = p.look;
+    container.innerHTML = '';
+    var wrap = h('div', { class: 'studio' });
+    var view = h('div', { class: 'studio-view' });
+    var tools = h('div', { class: 'studio-tools' });
+    wrap.appendChild(view); wrap.appendChild(tools);
+    container.appendChild(wrap);
+    function commit() { TT.store.save(); opts.onChange && opts.onChange(); draw(); }
+    function draw() {
+      view.innerHTML = '<div class="studio-figs">' + A.girlSVG(look, 'char') + A.svg('0 0 120 200', A.girlBack(look), 'char') + '</div>';
+      view.appendChild(h('p', { class: 'muted small', text: 'Nhìn từ trước và từ sau lưng' }));
+      tools.innerHTML = '';
+      function swatches(label, key) {
+        var row = h('div', { class: 'chip-row', role: 'group', 'aria-label': label }, [h('span', { class: 'row-label', text: label })]);
+        PALETTE[key].forEach(function (c) {
+          var on = (look[key] || '') === c[0];
+          row.appendChild(btn(h('span', { class: 'swatch', style: 'background:' + (c[2] || c[0]) }), 'chip-btn swatch-btn' + (on ? ' on' : ''), function () {
+            if (c[0]) look[key] = c[0]; else delete look[key];
+            commit();
+          }, { 'aria-pressed': on ? 'true' : 'false', 'aria-label': c[1], title: c[1] }));
+        });
+        tools.appendChild(row);
+      }
+      function chips(label, key, items) {
+        var row = h('div', { class: 'chip-row', role: 'group', 'aria-label': label }, [h('span', { class: 'row-label', text: label })]);
+        items.forEach(function (name, i) {
+          row.appendChild(btn(name, 'chip-btn' + ((look[key] || 0) === i ? ' on' : ''), function () { look[key] = i; commit(); }, { 'aria-pressed': (look[key] || 0) === i ? 'true' : 'false' }));
+        });
+        tools.appendChild(row);
+      }
+      swatches('Màu tóc', 'hc');
+      chips('Kiểu tóc', 'hair', look.boy ? ['Tóc ngắn', 'Đầu đinh', 'Tóc mái lệch'] : ['Hai bím', 'Tóc ngắn', 'Tóc dài']);
+      swatches('Màu áo', 'sh');
+      swatches(look.boy ? 'Màu quần' : 'Màu váy', 'sk');
+      swatches('Màu giày', 'so');
+      swatches('Màu ba lô', 'bag');
+      chips('Phụ kiện', 'acc', look.boy ? ['Không', 'Mũ lưỡi trai', 'Kính tròn', 'Huy hiệu sao'] : ['Không', 'Nơ hồng', 'Bờm vàng', 'Kẹp ngôi sao']);
+      tools.appendChild(h('div', { class: 'row-actions wrap' }, [
+        btn('Tô ngẫu nhiên', 'secondary', function () {
+          ['hc', 'sh', 'sk', 'so', 'bag'].forEach(function (k) { var c = E.pick(PALETTE[k]); if (c[0]) look[k] = c[0]; else delete look[k]; });
+          look.hair = Math.floor(Math.random() * 3); look.acc = Math.floor(Math.random() * 4);
+          TT.audio.play('pop'); commit();
+        }, { id: 'btn-random' }),
+        btn('Về đồng phục', 'ghost', function () { delete look.hc; delete look.sh; delete look.sk; delete look.so; commit(); }),
+        btn('Xong', 'primary big', function () { opts.onDone && opts.onDone(); }, { id: 'btn-studio-done' })
+      ]));
+    }
+    draw();
+  }
+
+  /* =================== HƯỚNG DẪN CHƠI =================== */
+  function guide(opts) {
+    init();
+    var touch = document.body.classList.contains('touch');
+    var steps = [
+      ['walk', 'Đi lại', touch ? 'Giữ ngón tay trên vòng tròn ở góc trái và nghiêng về hướng con muốn đi. Con cũng có thể chạm vào nơi muốn tới.' : 'Dùng phím mũi tên hoặc W A S D. Con cũng có thể nhấn giữ chuột, bạn nhỏ sẽ đi theo.'],
+      ['door', 'Vào một nơi', 'Đứng gần cửa lớp, thư viện, vườn… sẽ hiện nút vàng. ' + (touch ? 'Chạm nút vàng để vào.' : 'Nhấn Enter hoặc bấm nút vàng để vào.') + ' Thanh “Đi nhanh” đưa con tới thẳng từng nơi.'],
+      ['hint', 'Đường tới trường', 'Đi trên vỉa hè tới vạch sang đường. Đèn cho người đi bộ đỏ thì đứng chờ, đèn xanh thì nhìn hai bên rồi sang. Sang đúng luật được thưởng sao!'],
+      ['book', 'Học và luyện', 'Chạm “Bảng lớp” hoặc “Môn học” để chọn Cửu chương, Toán, Khoa học, Tiếng Anh, Kỹ năng sống. Mỗi lượt có 6 câu.'],
+      ['speak', 'Làm sai không sao cả', 'Sai lần đầu sẽ có gợi ý. Sai lần nữa, cô sẽ chỉ đáp án và giải thích. Câu đó lát sau được hỏi lại để con nhớ.'],
+      ['star', 'Ngôi sao để làm gì?', 'Xong mỗi lượt con được ngôi sao và bánh cho thú. Dùng sao để trang trí đảo và mua phụ kiện cho thú cưng.'],
+      ['art', 'Tô màu nhân vật', 'Vào Phòng Mỹ thuật để tô màu tóc, áo, váy, giày, ba lô cho nhân vật thật xinh theo ý con.'],
+      ['pets', 'Trò chuyện và khám phá', 'Chạm vào thầy cô, các bạn, chú chim, cái cây, lá cờ, vòi rửa tay… Ai cũng có điều muốn nói với con.'],
+      ['home', 'Nghỉ ngơi', 'Chơi một lúc thì cho mắt nghỉ nhé. Tiến độ của con được lưu lại, lần sau vào chơi tiếp.']
+    ];
+    var list = h('ol', { class: 'guide-list' });
+    steps.forEach(function (st) {
+      list.appendChild(h('li', {}, [h('span', { class: 'guide-ico', html: A.icon(st[0]) }), h('span', { class: 'guide-txt' }, [h('b', { text: st[1] }), h('span', { text: st[2] })])]));
+    });
+    var row = h('div', { class: 'row-actions' });
+    if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak(steps.map(function (st) { return st[1] + '. ' + st[2]; }).join(' ')); }));
+    row.appendChild(btn('Con hiểu rồi', 'primary big', function () { opts && opts.onClose && opts.onClose(); }, { id: 'btn-guide-ok' }));
+    return h('div', { class: 'guide' }, [h('h2', { text: 'Hướng dẫn chơi' }), list, row]);
+  }
+
   /* =================== LỜI THOẠI NPC =================== */
   function npcLines(n, p) {
     init();
     var name = charName();
+    var pet = A.PET_NAMES[p.pet];
     var lines = {
-      binh: ['Chào ' + name + '! Chú Bình chúc con một ngày học vui nhé.', 'Nhớ rửa tay trước khi ăn nha con!', 'Cổng khám phá bên trái dẫn sang đảo thú cưng đó.'],
-      hang: ['Cô Hằng đây! Con lên bảng lớp, mình học phép nhân bằng hình nhé.', 'Phép nhân là cộng các nhóm bằng nhau đó con.', 'Sai cũng không sao, mình nhìn hình rồi thử lại.', 'Con về bàn học ngồi, cô trò mình cùng luyện vài câu nhé.'],
-      lan: ['Hello! Cô là cô Lan, dạy Tiếng Anh. How are you today?', 'Mỗi ngày học vài từ mới là con giỏi Tiếng Anh ngay thôi.', 'Con nhớ nghe máy đọc rồi đọc theo thật to nhé!'],
-      nam: ['Thầy Nam dạy Khoa học đây. Con có biết vì sao có mưa không?', 'Hôm nay mình thử một nhiệm vụ mới nhé?', 'Mỗi nhiệm vụ chỉ vài câu thôi, làm xong mình nghỉ.'],
-      hoa: ['Thư viện có trò ghép thẻ phép tính đó con.', 'Cô Hoa thích nhất là bạn nào đọc kỹ câu hỏi.', 'Ghép đúng thẻ là con nhớ thêm một phép tính rồi!'],
-      kid: ['Chào ' + name + '! Mình cùng chơi nhé!', 'Mình hay nhớ bảng 5 bằng cách đếm 5, 10, 15...', 'Bảng 9 có mẹo hay lắm: 10 nhóm rồi bớt 1 nhóm!', 'Ra sân thể thao chuyền bóng với mình không?'],
-      seat: ['Chào ' + name + '! Bàn của bạn ở giữa hàng đầu đó.', 'Tớ đang chép bảng nhân trên bảng lớp nè.', 'Bảng 2 dễ lắm: cứ đếm cách 2 là ra!', 'Tí nữa ra chơi mình ra sân nghe chim hót nhé!']
+      binh: ['Chào ' + name + '! Chú Bình chúc con một ngày học vui nhé.', 'Nhớ rửa tay trước khi ăn nha con!', 'Cổng khám phá bên trái dẫn sang đảo thú cưng đó.',
+        'Ra về nhớ chờ bố mẹ ở trong cổng trường, đừng chạy ra đường nhé.', 'Con thấy đồ rơi thì mang ra chốt bảo vệ, chú tìm người trả lại.', 'Hôm nay sân trường sạch quá, cảm ơn các con đã không xả rác.',
+        'Trống trường là chú đánh đấy: tùng… tùng… tùng!', pet.charAt(0).toUpperCase() + pet.slice(1) + ' của con ngoan quá, đi đâu cũng theo.'],
+      hang: ['Cô Hằng đây! Con lên bảng lớp, mình học phép nhân bằng hình nhé.', 'Phép nhân là cộng các nhóm bằng nhau đó con.', 'Sai cũng không sao, mình nhìn hình rồi thử lại.', 'Con về bàn học ngồi, cô trò mình cùng luyện vài câu nhé.',
+        'Hôm nay ' + name + ' muốn học môn gì? Con chạm vào bảng lớp để chọn nhé.', 'Con nhớ đọc kĩ đề bài trước khi chọn đáp án.', 'Bảng 5 điều Bác Hồ dạy ở trên tường kia, con đọc thuộc chưa?',
+        'Mỗi ngày học một ít, đều đặn thì nhớ rất lâu.', 'Cô thấy ' + name + ' tiến bộ từng ngày đấy!', 'Học xong con nhớ ra sân chơi cho mắt được nghỉ nhé.'],
+      lan: ['Hello! Cô là cô Lan, dạy Tiếng Anh. How are you today?', 'Mỗi ngày học vài từ mới là con giỏi Tiếng Anh ngay thôi.', 'Con nhớ nghe máy đọc rồi đọc theo thật to nhé!',
+        'Good morning, ' + name + '! Hôm nay mình học từ gì nào?', '"Thank you" là cảm ơn, "sorry" là xin lỗi. Hai từ này dùng mỗi ngày đấy.', 'Con thử đếm bằng tiếng Anh: one, two, three…',
+        'What\'s your favourite subject? Môn con thích nhất là gì?', 'Đọc sai cũng không sao. Cứ mạnh dạn nói là tiến bộ.', 'See you later! Hẹn gặp lại con.'],
+      nam: ['Thầy Nam dạy Khoa học đây. Con có biết vì sao có mưa không?', 'Hôm nay mình thử một nhiệm vụ mới nhé?', 'Mỗi nhiệm vụ chỉ vài câu thôi, làm xong mình nghỉ.',
+        'Nước có ba thể: rắn, lỏng và khí. Con kể được ví dụ không?', 'Cây xanh quang hợp tạo ra khí ô-xi cho chúng ta thở.', 'Âm thanh sinh ra khi vật rung động. Con thử sờ vào cổ khi nói xem!',
+        'Bóng của con dài nhất vào sáng sớm và chiều muộn đấy.', 'Thấy điều gì lạ thì cứ hỏi "Vì sao?". Đó là cách các nhà khoa học bắt đầu.', 'Xem bảng tin đi con, hôm nay thầy có nhiệm vụ mới.'],
+      hoa: ['Thư viện có trò ghép thẻ phép tính đó con.', 'Cô Hoa thích nhất là bạn nào đọc kỹ câu hỏi.', 'Ghép đúng thẻ là con nhớ thêm một phép tính rồi!',
+        'Vào thư viện mình đi nhẹ, nói khẽ nhé.', 'Đọc sách mỗi ngày giúp con biết thêm bao điều hay.', 'Đọc xong con nhớ để sách về đúng chỗ.', 'Con thích truyện cổ tích hay truyện khoa học?', 'Ngồi đọc sách thẳng lưng, đủ ánh sáng cho mắt khoẻ nhé.'],
+      tam: ['Cô Tâm nấu bếp đây. Hôm nay nhà ăn có canh rau và cá kho, ngon lắm!', 'Con nhớ rửa tay bằng xà phòng trước khi ăn nhé.', 'Quà vặt không rõ nguồn gốc ở cổng trường, con đừng mua kẻo đau bụng.',
+        'Ăn đủ cơm, thịt cá, rau và quả thì mới mau lớn.', 'Uống nước lọc tốt hơn nước ngọt nhiều lắm con ạ.', 'Ăn chậm, nhai kĩ, không vừa ăn vừa chạy nhảy nhé.', 'Ăn xong nhớ súc miệng và cất khay đúng chỗ.', 'Đồ ăn có mùi lạ hay hết hạn thì tuyệt đối không ăn, con nhé.'],
+      congan: ['Chào con! Chú là cảnh sát giao thông, giữ cho đường phố an toàn.', 'Đèn đỏ dừng lại, đèn vàng đi chậm, đèn xanh mới được đi.', 'Sang đường thì đi trên vạch kẻ đường và nhìn kĩ hai bên, con nhé.',
+        'Ngồi xe máy nhớ đội mũ bảo hiểm và cài quai cẩn thận.', 'Không chơi đùa dưới lòng đường, nguy hiểm lắm.', 'Đi bộ thì đi trên vỉa hè, sát mép đường.', 'Con muốn học thêm về an toàn giao thông không? Chú có vài câu đố đây.', 'Chúc con đi học vui! Qua đường nhớ chờ đèn xanh.'],
+      nong: ['Chào cháu! Bác đang thăm đồng. Lúa năm nay tốt lắm.', 'Hạt gạo cháu ăn là từ cây lúa này đấy. Làm ra hạt gạo vất vả lắm.', 'Con trâu là bạn của nhà nông, giúp bác cày ruộng.',
+        'Cò trắng hay về đồng bắt tôm tép.', 'Cháu ăn cơm nhớ ăn hết, đừng bỏ thừa nhé.', 'Trời nắng thì lúa mau chín, trời mưa thì lúa có nước.', 'Đi học chăm ngoan nhé cháu!'],
+      kid: ['Chào ' + name + '! Mình cùng chơi nhé!', 'Mình hay nhớ bảng 5 bằng cách đếm 5, 10, 15...', 'Bảng 9 có mẹo hay lắm: 10 nhóm rồi bớt 1 nhóm!', 'Ra sân thể thao chuyền bóng với mình không?',
+        'Cậu chạm vào chú chim trên sân chưa? Nó hót hay lắm!', 'Tớ vừa được 3 ngôi sao ở Vườn toán học đấy.', 'Cậu tô màu nhân vật ở Phòng Mỹ thuật chưa? Vui lắm!', 'Sáng nay tớ chờ đèn xanh mới sang đường, được chú Cảnh sát khen.',
+        'Cô Lan dạy tớ nói "Good morning". Good morning, ' + name + '!', 'Tớ thích môn Khoa học nhất vì được biết vì sao có mưa.', 'Giờ ra chơi mình ra ghế đá ngồi nhé.', pet.charAt(0).toUpperCase() + pet.slice(1) + ' của cậu đáng yêu quá!'],
+      seat: ['Chào ' + name + '! Bàn của bạn ở giữa hàng đầu đó.', 'Tớ đang chép bảng nhân trên bảng lớp nè.', 'Bảng 2 dễ lắm: cứ đếm cách 2 là ra!', 'Tí nữa ra chơi mình ra sân nghe chim hót nhé!',
+        'Cậu thuộc 5 điều Bác Hồ dạy chưa? Tớ thuộc rồi đấy.', 'Tớ đố cậu: 7 × 8 bằng bao nhiêu?', 'Suỵt… cô Hằng đang nhìn kìa, mình học bài thôi.', 'Cho tớ mượn cục tẩy với!', 'Hôm nay có tiết Tiếng Anh của cô Lan, tớ thích lắm.']
     };
     if (n.seat) return lines.seat;
     return n.kind === 'kid' ? lines.kid : lines[n.id];
   }
 
-  TT.act = { learn: learn, library: library, board: board, art: art, island: island, pets: pets,
+  TT.act = { studio: studio, guide: guide, learn: learn, library: library, board: board, art: art, island: island, pets: pets,
     todayQuest: todayQuest, tableProgress: tableProgress, npcLines: npcLines, QUEST_GAMES: QUEST_GAMES };
 })(window);

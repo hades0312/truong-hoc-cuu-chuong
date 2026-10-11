@@ -659,8 +659,6 @@ body.reduced-motion * { animation: none !important; transition: none !important;
 .topic-btn small { font-weight: 600; opacity: .75; font-size: .8rem; }
 .modal.wide { width: min(680px, 100%); }
 /* 5 điều Bác Hồ dạy */
-.five h2 { color: #c1121f; }
-.five ol { text-align: left; margin: 10px auto; max-width: 22em; padding-left: 1.6em; font-size: 1.3rem; font-weight: 800; line-height: 1.9; color: #1d3f8f; }
 .subj-card > span { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .topic-in { display: flex; align-items: center; gap: 10px; }
 .tp.subj-row { grid-template-columns: 8.5em 6em 1fr; }
@@ -749,7 +747,6 @@ body.reduced-motion * { animation: none !important; transition: none !important;
   .topic-btn { min-height: 46px; padding: 4px 10px; }
   .row-actions { margin: 8px 0 2px; }
   .btn.big { min-height: 50px; font-size: 1.1rem; }
-  .five ol { font-size: 1.05rem; line-height: 1.55; margin: 4px auto; }
   .photo-box img { max-height: calc(100vh - 150px); width: auto; }
   .dialog { padding: 10px 14px; }
   .dialog-avatar, .dialog-avatar svg { width: 64px; }
@@ -798,3 +795,78 @@ body.reduced-motion * { animation: none !important; transition: none !important;
   .title-actions { margin-top: 8px; gap: 6px; }
   .title-actions .btn.big { min-height: 44px; }
 }
+
+/* ---------- Đường tới trường: đèn giao thông, xe cộ ---------- */
+.lamp { opacity: .16; }
+.scene-road[data-light="go"] .car-g, .scene-road[data-light="go"] .ped-r,
+.scene-road[data-light="slow"] .car-y, .scene-road[data-light="slow"] .ped-r,
+.scene-road[data-light="stop"] .car-r, .scene-road[data-light="stop"] .ped-r,
+.scene-road[data-light="walk"] .car-r, .scene-road[data-light="walk"] .ped-g,
+.scene-road[data-light="hurry"] .car-r, .scene-road[data-light="hurry"] .ped-g { opacity: 1; }
+.scene-road[data-light="hurry"] .ped-g { animation: lamp-blink .5s steps(2, start) infinite; }
+@keyframes lamp-blink { to { opacity: .16; } }
+.veh { pointer-events: none; }
+[data-hit="poke"] { cursor: pointer; }
+
+/* ---------- 5 điều Bác Hồ dạy: tấm bảng đỏ viền vàng ---------- */
+.five-board { position: relative; margin: 4px auto 0; max-width: 560px; padding: 26px 22px 20px; border-radius: 18px; text-align: center; color: #fff;
+  background: radial-gradient(circle at 50% 0, #e5383b, #b1121f 70%); box-shadow: inset 0 0 0 4px #b8860b, inset 0 0 0 9px #ffd166, inset 0 0 0 11px #b8860b, var(--shadow); }
+.five-star { width: 54px; height: 54px; margin: 0 auto 2px; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .2)); }
+.five-star svg { width: 100%; height: 100%; }
+.five .five-board h2 { color: #ffe066; font-size: clamp(1.5rem, 5vw, 2.1rem); letter-spacing: 1px; text-transform: uppercase; margin: 0; text-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.five-sub { margin: 0 0 10px; font-weight: 700; color: #ffe8a3; font-style: italic; }
+.five .five-list { list-style: none; margin: 0 auto; padding: 0; max-width: 23em; text-align: left; font-size: clamp(1.1rem, 3.4vw, 1.45rem); font-weight: 800; line-height: 1.3; color: #fff; }
+.five-list li { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px dashed rgba(255, 224, 102, .45); }
+.five-list li:last-child { border-bottom: 0; }
+.five-n { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: #ffe066; color: #b1121f; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; box-shadow: 0 2px 0 rgba(0, 0, 0, .2); }
+
+/* ---------- Tô màu nhân vật ---------- */
+.studio { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.4fr); gap: 14px; align-items: start; }
+@media (max-aspect-ratio: 1/1), (max-width: 700px) { .studio { grid-template-columns: 1fr; } }
+.studio-view, .studio-tools { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+.studio-view { text-align: center; position: sticky; top: 0; }
+.studio-figs { display: flex; justify-content: center; gap: 6px; }
+.studio-figs .char { width: 46%; max-width: 170px; height: auto; }
+.studio-tools .chip-row { margin: 6px 0; }
+.subj-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* ---------- Hướng dẫn chơi ---------- */
+.guide h2 { color: var(--primary); }
+.guide-list { list-style: none; counter-reset: g; margin: 8px 0 0; padding: 0; text-align: left; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; }
+.guide-list li { display: flex; gap: 10px; align-items: flex-start; background: #f6f3ff; border-radius: 16px; padding: 10px 12px; }
+.guide-ico { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: #fff; color: var(--primary); display: inline-flex; align-items: center; justify-content: center; }
+.guide-ico .ico { width: 28px; height: 28px; }
+.guide-txt { display: flex; flex-direction: column; line-height: 1.4; font-weight: 600; }
+.guide-txt b { font-size: 1.05rem; color: var(--ink); }
+.modal.guide-modal { width: min(860px, 100%); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .five-board { padding: 14px 18px 10px; display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: center; max-width: none; }
+  .five-star { width: 40px; height: 40px; grid-row: span 2; }
+  .five .five-board h2 { font-size: 1.25rem; text-align: left; }
+  .five-sub { text-align: left; margin: 0; font-size: .9rem; }
+  .five .five-list { grid-column: 1 / -1; font-size: 1.02rem; max-width: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; margin-top: 6px; }
+  .five-list li { padding: 4px 0; }
+  .five-n { width: 28px; height: 28px; }
+  .studio { grid-template-columns: minmax(150px, .5fr) minmax(0, 1.5fr); gap: 10px; }
+  .studio-view, .studio-tools { padding: 8px 10px; }
+  .studio-tools .chip-row { margin: 3px 0; }
+  .studio-tools .chip-btn { min-height: 40px; min-width: 40px; padding: 4px 10px; }
+  .guide-list { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .guide-list li { padding: 6px 10px; }
+  .guide-txt { font-size: .92rem; }
+  .title-top #btn-guide > span > span { display: none; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .title-top .icon-btn[aria-label="Toàn màn hình"] { display: none; }
+}
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 900px) {
+  .title-top .pill > span > span { display: none; }
+  .title-top .pill { padding: 6px 12px; }
+}
+
+/* ---------- Tham quan trường: trường em, quê em ---------- */
+.home-box h2 { color: var(--primary); }
+.home-list { list-style: none; margin: 8px 0 0; padding: 0; text-align: left; display: grid; gap: 8px; }
+.home-list li { position: relative; background: #eaf6e2; border-radius: 14px; padding: 10px 14px 10px 44px; font-weight: 700; line-height: 1.45; }
+.home-list li::before { content: ""; position: absolute; left: 14px; top: 14px; width: 18px; height: 18px; border-radius: 50%; background: #2a9d8f; box-shadow: inset 0 0 0 4px #b7e4c7; }
+@media (orientation: landscape) and (max-height: 520px) { .home-list { grid-template-columns: 1fr 1fr; gap: 6px; } .home-list li { padding: 6px 10px 6px 36px; font-size: .92rem; } .home-list li::before { left: 10px; top: 9px; } }

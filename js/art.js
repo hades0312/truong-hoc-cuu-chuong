@@ -163,6 +163,19 @@
     return s;
   }
 
+  /* Màu bé tự tô ở Phòng Mỹ thuật: hc tóc · sh áo · sk váy/quần · so giày (bỏ trống = màu đồng phục).
+   * Hình vẽ dùng màu đồng phục cố định, ở đây đổi các màu đó sang màu bé chọn. */
+  function tint(str, o) {
+    if (!o) return str;
+    if (o.hc) str = str.split(HAIR).join(o.hc);
+    if (o.sh) str = str.split('fill="#fff" stroke="#e3e6f0"').join('fill="' + o.sh + '" stroke="#000" stroke-opacity=".14"');
+    if (o.sk) str = str.split('#33508f').join(o.sk).split('#26407a').join('rgba(0,0,0,.22)');
+    if (o.so) str = str.split('#5b4a8a').join(o.so).split('#3f4a6b').join(o.so);
+    return str;
+  }
+  function hero(o) { return tint(girl(o), o); }
+  function heroBack(o) { return tint(girlBack(o), o); }
+
   /* ---------- Bạn học NPC ---------- */
   /* Các bạn nam trong danh sách CLASSMATES (storage.js); những bạn còn lại vẽ hình bạn nữ */
   var BOYS = ['Bảo Trọng', 'Vinh Chí', 'Đức Dũng', 'Huy Đăng', 'Phúc Lâm', 'Tiến Thành', 'Văn Thịnh', 'Trung Trí', 'Bá Tùng',
@@ -224,7 +237,10 @@
       nam: { top: '#b7e4c7', bottom: '#4a5a7a', hair: 'short', extra: 'tie' },
       hoa: { top: '#cdb4db', bottom: '#6d597a', hair: 'bun', extra: 'book', dress: true },
       lan: { top: '#ffc8dd', bottom: '#ffc8dd', hair: 'long', extra: 'abc', dress: true },
-      binh: { top: '#d4a373', bottom: '#5e503f', hair: 'cap', extra: 'whistle' }
+      binh: { top: '#d4a373', bottom: '#5e503f', hair: 'cap', extra: 'whistle' },
+      congan: { top: '#e2c275', bottom: '#b9964a', hair: 'cap', extra: 'whistle', cap: '#d8b45c', band: '#c1121f' }, // cảnh sát giao thông
+      tam: { top: '#ffffff', bottom: '#ffffff', hair: 'bun', extra: 'apron', dress: true },                          // cô cấp dưỡng
+      nong: { top: '#8d6e63', bottom: '#5e503f', hair: 'non', extra: '' }                                             // bác nông dân đội nón lá
     }[kind];
     s += '<rect x="46" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/><rect x="62" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/>';
     s += '<rect x="42" y="202" width="18" height="10" rx="5" fill="#3a3a3a"/><rect x="60" y="202" width="18" height="10" rx="5" fill="#3a3a3a"/>';
@@ -240,9 +256,12 @@
     if (conf.hair === 'long') s += '<path d="M28 56 Q22 108 40 112 L80 112 Q98 108 92 56 Z" fill="' + HAIR + '"/>';
     if (conf.hair === 'bun') s += '<circle cx="60" cy="22" r="14" fill="' + HAIR + '"/>';
     s += '<circle cx="60" cy="56" r="30" fill="' + HAIR + '"/><ellipse cx="60" cy="62" rx="26" ry="27" fill="' + SKIN + '"/>';
-    if (conf.hair === 'short' || conf.hair === 'cap') s += '<path d="M33 54 Q34 30 60 30 Q86 30 87 54 Q76 42 60 44 Q44 42 33 54 Z" fill="' + HAIR + '"/>';
+    if (conf.hair === 'short' || conf.hair === 'cap' || conf.hair === 'non') s += '<path d="M33 54 Q34 30 60 30 Q86 30 87 54 Q76 42 60 44 Q44 42 33 54 Z" fill="' + HAIR + '"/>';
     else s += '<path d="M33 56 Q32 30 60 30 Q88 30 87 56 Q74 38 58 44 Q44 40 33 56 Z" fill="' + HAIR + '"/>';
-    if (conf.hair === 'cap') s += '<path d="M30 46 Q60 14 90 46 Z" fill="#34495e"/><rect x="28" y="42" width="66" height="8" rx="4" fill="#2c3e50"/><circle cx="60" cy="34" r="5" fill="#ffd166"/>';
+    if (conf.hair === 'cap') s += '<path d="M30 46 Q60 14 90 46 Z" fill="' + (conf.cap || '#34495e') + '"/><rect x="28" y="42" width="66" height="8" rx="4" fill="' + (conf.band || '#2c3e50') + '"/><circle cx="60" cy="34" r="5" fill="#ffd166"/>';
+    if (conf.hair === 'non') s += '<path d="M14 50 L60 12 L106 50 Q60 60 14 50 Z" fill="#f2e2b0" stroke="#d9c38a" stroke-width="2"/><path d="M38 31 L60 12 L82 31" fill="none" stroke="#d9c38a" stroke-width="1.5"/>';
+    if (conf.extra === 'apron') s += '<path d="M44 108 H76 L80 176 H40 Z" fill="#ffd6e0" stroke="#f2a7b8" stroke-width="2"/><path d="M48 100 Q60 112 72 100" fill="none" stroke="#f2a7b8" stroke-width="3"/>' +
+      '<path d="M40 36 Q38 14 60 16 Q82 14 80 36 Z" fill="#fff" stroke="#e3e6f0" stroke-width="2"/><rect x="40" y="33" width="40" height="8" rx="3" fill="#fff" stroke="#e3e6f0" stroke-width="2"/>';
     s += face(60, 62, 26);
     if (conf.extra === 'glasses') s += '<g fill="none" stroke="#5a4a6a" stroke-width="2.5"><circle cx="50" cy="64" r="8"/><circle cx="70" cy="64" r="8"/><path d="M58 64 L62 64"/></g>';
     return s;
@@ -342,6 +361,7 @@
     board: '<rect x="4" y="4" width="24" height="18" rx="2" fill="#c68b59"/><rect x="7" y="7" width="8" height="6" fill="#fff"/><rect x="17" y="8" width="8" height="8" fill="#ffd6a5"/><rect x="8" y="15" width="7" height="5" fill="#caffbf"/><rect x="9" y="22" width="3" height="7" fill="#8d6e63"/><rect x="20" y="22" width="3" height="7" fill="#8d6e63"/>',
     review: '<path d="M16 5 A11 11 0 1 1 6 12" fill="none" stroke="#7b61ff" stroke-width="3.2" stroke-linecap="round"/><path d="M3 6 L6 13 L12 9" fill="none" stroke="#7b61ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 11 V17 L20 19" stroke="#7b61ff" stroke-width="2.6" stroke-linecap="round" fill="none"/>',
     book: '<path d="M3.5 8 Q10 4.5 16 8 Q22 4.5 28.5 8 V25.5 Q22 22 16 25.5 Q10 22 3.5 25.5 Z" fill="#fff" stroke="#7b61ff" stroke-width="2.6" stroke-linejoin="round"/><path d="M16 8 V25.5" stroke="#7b61ff" stroke-width="2.6"/><path d="M7.5 12.5 Q10 11.5 12.5 12.5 M7.5 16.5 Q10 15.5 12.5 16.5 M19.5 12.5 Q22 11.5 24.5 12.5 M19.5 16.5 Q22 15.5 24.5 16.5" stroke="#ff8fab" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    map: '<path d="M4 8 L12 5 L20 8 L28 5 V24 L20 27 L12 24 L4 27 Z" fill="#eaf6e2" stroke="#7b61ff" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 5 V24 M20 8 V27" stroke="#7b61ff" stroke-width="2"/><circle cx="16" cy="14" r="3" fill="#ef476f"/>',
     desk: '<rect x="3" y="12" width="26" height="6" rx="2" fill="#d6a877"/><rect x="5" y="18" width="3.5" height="10" fill="#a9774b"/><rect x="23.5" y="18" width="3.5" height="10" fill="#a9774b"/><rect x="10" y="5" width="12" height="7" rx="1.2" fill="#fff" stroke="#9fb7d1" stroke-width="1.2"/><path d="M12.5 8.5 H19.5" stroke="#9fb7d1" stroke-width="1.2"/>',
     door: '<rect x="8" y="3" width="17" height="26" rx="2" fill="#c68b59"/><rect x="11" y="6" width="11" height="9" rx="1" fill="#bde0fe"/><circle cx="21.5" cy="19" r="1.7" fill="#ffd166"/><path d="M5 29 H28" stroke="#8d6e63" stroke-width="2" stroke-linecap="round"/>',
     install: '<rect x="8" y="2.5" width="16" height="27" rx="4" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M16 9 V19 M11.5 15 L16 19.5 L20.5 15" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 25 H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
@@ -397,7 +417,7 @@
     return '<g transform="translate(' + x + ' ' + y + ')"><ellipse cx="0" cy="0" rx="' + w + '" ry="' + w * 0.5 + '" fill="#57c27a"/><ellipse cx="' + (-w * 0.4) + '" cy="' + (-w * 0.15) + '" rx="' + w * 0.5 + '" ry="' + w * 0.4 + '" fill="#6ccf8e"/><circle cx="' + (w * 0.3) + '" cy="' + (-w * 0.25) + '" r="' + w * 0.35 + '" fill="#7fd99b"/></g>';
   }
   function flowerBed(x, y, w) {
-    var s = '<g transform="translate(' + x + ' ' + y + ')"><rect x="' + (-w / 2) + '" y="-14" width="' + w + '" height="34" rx="16" fill="#c9a37a"/><rect x="' + (-w / 2 + 6) + '" y="-20" width="' + (w - 12) + '" height="22" rx="11" fill="#6ccf8e"/>';
+    var s = '<g data-hit="poke" data-id="hoa" transform="translate(' + x + ' ' + y + ')"><rect x="' + (-w / 2) + '" y="-14" width="' + w + '" height="34" rx="16" fill="#c9a37a"/><rect x="' + (-w / 2 + 6) + '" y="-20" width="' + (w - 12) + '" height="22" rx="11" fill="#6ccf8e"/>';
     var colors = ['#ff8fab', '#ffd166', '#f15bb5', '#ffffff', '#ff9f1c'];
     for (var i = 0; i < Math.floor(w / 26); i++) {
       s += '<circle cx="' + (-w / 2 + 18 + i * 26) + '" cy="' + (-14 + (i % 2) * 6) + '" r="7" fill="' + colors[i % colors.length] + '"/>';
@@ -437,15 +457,21 @@
       return '<g transform="translate(' + x + ' 900)"><rect x="-60" y="0" width="120" height="16" rx="8" fill="#adb5bd"/><rect x="-50" y="16" width="14" height="20" fill="#868e96"/><rect x="36" y="16" width="14" height="20" fill="#868e96"/></g>';
     };
     return [
-      { y: 880, s: '<rect x="1244" y="640" width="10" height="240" rx="4" fill="#adb5bd"/>' +
+      { y: 880, poke: 'co', s: '<rect x="1244" y="640" width="10" height="240" rx="4" fill="#adb5bd"/>' +
         '<g class="flag"><rect x="1254" y="646" width="96" height="64" fill="#da251d"/><path d="M1302 660 l5.6 17.4 h18.3 l-14.8 10.8 5.6 17.4 -14.7 -10.8 -14.8 10.8 5.6 -17.4 -14.7 -10.8 h18.2z" fill="#ffde00" transform="translate(0 -4) scale(1)"/></g>' },
-      { y: 862, s: tree(620, 860, 80, 'shade') }, { y: 936, s: bench(620) },
-      { y: 862, s: tree(1880, 860, 80, 'shade') }, { y: 936, s: bench(1880) },
+      { y: 862, poke: 'cay', s: tree(620, 860, 80, 'shade') }, { y: 936, poke: 'ghe', s: bench(620) },
+      { y: 862, poke: 'cay', s: tree(1880, 860, 80, 'shade') }, { y: 936, poke: 'ghe', s: bench(1880) },
       { y: 852, s: '<g id="b-board" transform="translate(900 760)"><rect x="-8" y="0" width="12" height="90" fill="#8d6e63"/><rect x="146" y="0" width="12" height="90" fill="#8d6e63"/>' +
         '<rect x="-20" y="-110" width="190" height="120" rx="10" fill="#c68b59"/><rect x="-10" y="-100" width="170" height="100" rx="6" fill="#fdf0d5"/>' +
         '<rect x="0" y="-90" width="60" height="40" fill="#fff" transform="rotate(-4 30 -70)"/><rect x="80" y="-92" width="66" height="46" fill="#caffbf" transform="rotate(3 113 -69)"/><rect x="20" y="-40" width="70" height="32" fill="#ffd6a5"/>' +
         label(75, -120, 'Bảng tin', 24) + '</g>' },
-      { y: 866, s: tree(2140, 860, 46, 'fruit', '#ef476f') }, { y: 856, s: tree(2240, 850, 50, 'fruit', '#ff9f1c') }, { y: 876, s: tree(2330, 870, 42, 'fruit', '#ef476f') },
+      { y: 866, poke: 'cayqua', s: tree(2140, 860, 46, 'fruit', '#ef476f') }, { y: 856, poke: 'cayqua', s: tree(2240, 850, 50, 'fruit', '#ff9f1c') }, { y: 876, poke: 'cayqua', s: tree(2330, 870, 42, 'fruit', '#ef476f') },
+      // bảng "Sơ đồ trường": chỗ bắt đầu chuyến tham quan
+      { y: 1216, s: '<g data-hit="zone" data-id="tour" transform="translate(1105 1216)"><rect x="-44" y="-8" width="9" height="34" fill="#8d6e63" transform="translate(0 -26)"/><rect x="35" y="-8" width="9" height="34" fill="#8d6e63" transform="translate(0 -26)"/>' +
+        '<rect x="-58" y="-112" width="116" height="82" rx="8" fill="#c68b59"/><rect x="-51" y="-105" width="102" height="68" rx="5" fill="#eaf6e2"/>' +
+        '<rect x="-30" y="-98" width="60" height="16" rx="3" fill="#fff3c4"/><rect x="-44" y="-76" width="20" height="14" rx="3" fill="#ffd6e0"/><rect x="24" y="-76" width="20" height="14" rx="3" fill="#d7ecff"/>' +
+        '<rect x="-20" y="-76" width="40" height="22" rx="4" fill="#f6e7c8"/><path d="M0 -54 V-42" stroke="#e9c46a" stroke-width="5"/><circle cx="0" cy="-65" r="3.5" fill="#da251d"/>' +
+        '</g>' },
       // cổng trường luôn che phía trước: bạn nhỏ đi qua bên dưới tấm biển
       { y: 1481, s: '<g id="gate-arch">' +
         '<rect x="1010" y="1240" width="50" height="240" rx="8" fill="#e9c46a"/><rect x="1440" y="1240" width="50" height="240" rx="8" fill="#e9c46a"/>' +
@@ -505,7 +531,7 @@
     s += '<g id="b-class">' + houseSide(700, 270, 880, 390, 1140, 150, 1600, 280, '#ead79c', '#c8632d') +
       '<rect x="700" y="270" width="880" height="390" rx="8" fill="#fff3c4"/>' +
       '<path d="M680 280 L1140 150 L1600 280 Z" fill="url(#roofA)"/><rect x="680" y="272" width="920" height="18" rx="6" fill="#d9692f"/>' +
-      '<circle cx="1140" cy="225" r="34" fill="#fff" stroke="#3b2f63" stroke-width="5"/><path d="M1140 225 V202 M1140 225 L1156 233" stroke="#3b2f63" stroke-width="5" stroke-linecap="round"/>' +
+      '<g data-hit="poke" data-id="dongho"><circle cx="1140" cy="225" r="34" fill="#fff" stroke="#3b2f63" stroke-width="5"/><path d="M1140 225 V202 M1140 225 L1156 233" stroke="#3b2f63" stroke-width="5" stroke-linecap="round"/></g>' +
       // tầng 2 + hành lang
       windowRow(740, 310, 6, 128, 84, 66) +
       '<rect x="700" y="400" width="880" height="16" fill="#e9c46a"/>' +
@@ -518,7 +544,7 @@
       '<g fill="#e9c46a">' + (function () { var r = ''; for (var k = 0; k < 7; k++) r += '<rect x="' + (1590 + k * 0) + '" y="' + (420 + k * 34) + '" width="' + (60 + k * 6) + '" height="12" rx="3"/>'; return r; })() + '</g>' +
       '<path d="M1590 420 L1680 660" stroke="#d4a373" stroke-width="8"/>' +
       // bảng tên lớp
-      signBoard(782, 297, 96, 'Lớp 4A', '#fff', 20) + signBoard(1038, 297, 96, 'Lớp 4B', '#fff', 20) + signBoard(1294, 297, 96, 'Lớp 3A', '#fff', 20) + signBoard(1508, 297, 96, 'Lớp 5A', '#fff', 20) +
+      signBoard(782, 297, 96, 'Lớp 4E', '#fff', 20) + signBoard(1038, 297, 96, 'Lớp 4B', '#fff', 20) + signBoard(1294, 297, 96, 'Lớp 3A', '#fff', 20) + signBoard(1508, 297, 96, 'Lớp 5A', '#fff', 20) +
       signBoard(1140, 456, 290, 'Lớp học cửu chương', '#fff', 24) +
       '</g>';
 
@@ -535,8 +561,8 @@
       '<rect x="2140" y="530" width="56" height="110" rx="8" fill="#0a9396"/><rect x="2230" y="530" width="56" height="110" rx="8" fill="#ee6c4d"/>' +
       '<circle cx="2168" cy="510" r="11" fill="#0a9396"/><circle cx="2258" cy="510" r="11" fill="#ee6c4d"/>' +
       label(2215, 462, 'Nhà vệ sinh', 20) +
-      '<g transform="translate(2060 660)"><rect x="-40" y="-6" width="80" height="34" rx="8" fill="#ced4da"/><rect x="-30" y="-2" width="60" height="16" rx="6" fill="#90e0ef"/><path d="M-14 -6 V-24 H0 M14 -6 V-24 H0" stroke="#868e96" stroke-width="5" fill="none"/></g>' +
-      '<g transform="translate(2330 680)"><rect x="-20" y="-30" width="40" height="50" rx="6" fill="#06d6a0"/><rect x="-24" y="-36" width="48" height="10" rx="4" fill="#049a74"/><rect x="26" y="-30" width="40" height="50" rx="6" fill="#ffd166"/><rect x="22" y="-36" width="48" height="10" rx="4" fill="#e9b949"/></g>' +
+      '<g data-hit="poke" data-id="ruatay" transform="translate(2060 660)"><rect x="-40" y="-6" width="80" height="34" rx="8" fill="#ced4da"/><rect x="-30" y="-2" width="60" height="16" rx="6" fill="#90e0ef"/><path d="M-14 -6 V-24 H0 M14 -6 V-24 H0" stroke="#868e96" stroke-width="5" fill="none"/></g>' +
+      '<g data-hit="poke" data-id="thungrac" transform="translate(2330 680)"><rect x="-20" y="-30" width="40" height="50" rx="6" fill="#06d6a0"/><rect x="-24" y="-36" width="48" height="10" rx="4" fill="#049a74"/><rect x="26" y="-30" width="40" height="50" rx="6" fill="#ffd166"/><rect x="22" y="-36" width="48" height="10" rx="4" fill="#e9b949"/></g>' +
       '</g>';
 
     // Vườn toán học (phải giữa)
@@ -732,13 +758,126 @@
     return list;
   }
 
+  /* ---------- Đường tới trường (thế giới 2600×1200) ----------
+   * Từ trên xuống: trời và núi xa, đồng lúa – làng quê (bên trái) và mặt trước trường (bên phải), vỉa hè phía xa,
+   * mặt đường hai làn có vạch sang đường, vỉa hè phía gần (bé đi ở đây), rồi nhà của bé và trạm xe buýt. */
+  var ROAD = { w: 2600, h: 1200 };
+
+  function smallHouse(x, y, wall, roof) {
+    return '<g transform="translate(' + x + ' ' + y + ')"><rect x="-44" y="-50" width="88" height="50" fill="' + wall + '"/><path d="M-54 -48 L0 -86 L54 -48 Z" fill="' + roof + '"/>' +
+      '<rect x="-12" y="-30" width="20" height="30" fill="#8d6e63"/><rect x="18" y="-34" width="16" height="14" fill="#dff3ff" stroke="#fff" stroke-width="2"/></g>';
+  }
+  function palm(x, y, hgt) {
+    return '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 0 Q8 ' + (-hgt / 2) + ' 2 ' + (-hgt) + '" fill="none" stroke="#9c6b4e" stroke-width="9" stroke-linecap="round"/>' +
+      '<g class="crown" fill="none" stroke="#4fb36e" stroke-width="9" stroke-linecap="round"><path d="M2 ' + (-hgt) + ' q-34 -10 -52 12 M2 ' + (-hgt) + ' q34 -10 52 12 M2 ' + (-hgt) + ' q-22 -30 -44 -22 M2 ' + (-hgt) + ' q22 -30 44 -22 M2 ' + (-hgt) + ' q0 -28 4 -40"/></g></g>';
+  }
+  /* Cột đèn giao thông: ba đèn cho xe (car-r/y/g) và hai đèn cho người đi bộ (ped-r/g); đèn nào sáng do CSS theo data-light của cảnh */
+  function trafficPole(x, y, car, ped) {
+    var s = '<g data-hit="poke" data-id="den" transform="translate(' + x + ' ' + y + ')"><rect x="-5" y="-170" width="10" height="170" rx="4" fill="#5c677d"/><rect x="-13" y="-8" width="26" height="10" rx="4" fill="#495057"/>';
+    if (car) s += '<rect x="-18" y="-252" width="36" height="86" rx="9" fill="#2b2f3a"/><circle class="lamp car-r" cx="0" cy="-234" r="11" fill="#ff3b30"/><circle class="lamp car-y" cx="0" cy="-209" r="11" fill="#ffcc00"/><circle class="lamp car-g" cx="0" cy="-184" r="11" fill="#34c759"/>';
+    if (ped) s += '<g transform="translate(' + (car ? 34 : 0) + ' ' + (car ? -150 : -168) + ')"><rect x="-16" y="-62" width="32" height="62" rx="8" fill="#2b2f3a"/>' +
+      '<g class="lamp ped-r" fill="#ff3b30"><circle cx="0" cy="-51" r="4.2"/><rect x="-4" y="-46" width="8" height="12" rx="3"/></g>' +
+      '<g class="lamp ped-g" fill="#34c759"><circle cx="1" cy="-23" r="4.2"/><path d="M-5 -6 L0 -18 L5 -6 M-5 -14 L6 -14" stroke="#34c759" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>';
+    return s + '</g>';
+  }
+  /* Xe cộ nhìn ngang, đầu xe quay sang phải, gốc toạ độ ở mép sau – sát mặt đường. Trả về {s, len} */
+  function vehicle(kind, color) {
+    var wheel = function (x, r) { return '<circle cx="' + x + '" cy="' + (-r) + '" r="' + r + '" fill="#2b2f3a"/><circle cx="' + x + '" cy="' + (-r) + '" r="' + (r * 0.45) + '" fill="#ced4da"/>'; };
+    if (kind === 'bus') {
+      return { len: 236, s: '<rect x="0" y="-86" width="236" height="72" rx="14" fill="' + color + '"/><rect x="0" y="-40" width="236" height="10" fill="#fff" opacity=".55"/>' +
+        '<g fill="#dff3ff"><rect x="14" y="-76" width="36" height="28" rx="5"/><rect x="58" y="-76" width="36" height="28" rx="5"/><rect x="102" y="-76" width="36" height="28" rx="5"/><rect x="146" y="-76" width="36" height="28" rx="5"/><rect x="192" y="-76" width="34" height="40" rx="6"/></g>' +
+        '<rect x="226" y="-30" width="10" height="8" rx="3" fill="#ffe066"/>' + wheel(52, 15) + wheel(184, 15) };
+    }
+    if (kind === 'truck') {
+      return { len: 204, s: '<rect x="0" y="-84" width="132" height="70" rx="6" fill="#f1f3f5" stroke="#ced4da" stroke-width="3"/><path d="M136 -14 V-66 H172 Q190 -66 198 -42 L204 -30 V-14 Z" fill="' + color + '"/>' +
+        '<path d="M146 -58 H172 Q182 -58 188 -42 H146 Z" fill="#dff3ff"/><rect x="196" y="-28" width="8" height="8" rx="3" fill="#ffe066"/>' + wheel(40, 15) + wheel(104, 15) + wheel(170, 15) };
+    }
+    if (kind === 'moto') { // người lái đội mũ bảo hiểm
+      return { len: 96, s: wheel(16, 13) + wheel(80, 13) + '<path d="M16 -14 L40 -30 H62 L80 -14" fill="none" stroke="' + color + '" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 -30 L72 -48 H84" fill="none" stroke="#495057" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M34 -34 Q32 -62 48 -64 Q62 -62 62 -40 L58 -32 Z" fill="#4dabf7"/><path d="M50 -52 L74 -46" stroke="#4dabf7" stroke-width="7" stroke-linecap="round"/>' +
+        '<circle cx="50" cy="-76" r="12" fill="' + SKIN + '"/><path d="M37 -77 Q38 -92 51 -92 Q64 -92 64 -78 Z" fill="#e63946"/><rect x="36" y="-80" width="30" height="5" rx="2" fill="#c1121f"/>' };
+    }
+    return { len: 160, s: '<path d="M0 -14 Q0 -32 16 -34 L36 -36 Q46 -60 68 -60 H100 Q118 -60 128 -36 L148 -32 Q160 -30 160 -14 Z" fill="' + color + '"/>' +
+      '<path d="M46 -38 Q52 -53 68 -53 H80 V-38 Z M86 -53 H100 Q112 -53 120 -38 H86 Z" fill="#dff3ff"/><rect x="152" y="-30" width="8" height="8" rx="3" fill="#ffe066"/><rect x="0" y="-30" width="6" height="8" rx="2" fill="#ff6b6b"/>' + wheel(38, 14) + wheel(124, 14) };
+  }
+
+  function roadScene() {
+    var i, s = '<defs>' +
+      '<linearGradient id="rdsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3ff"/><stop offset="1" stop-color="#eaf8ff"/></linearGradient>' +
+      '<pattern id="rdlua" width="26" height="22" patternUnits="userSpaceOnUse"><rect width="26" height="22" fill="#b6e07a"/><path d="M5 20 q2 -9 0 -14 M13 20 q3 -10 0 -16 M21 20 q2 -9 0 -14" stroke="#8fc95a" stroke-width="2.4" fill="none" stroke-linecap="round"/></pattern>' +
+      '<pattern id="rdchin" width="26" height="22" patternUnits="userSpaceOnUse"><rect width="26" height="22" fill="#e6dc7a"/><path d="M5 20 q2 -9 0 -14 M13 20 q3 -10 0 -16 M21 20 q2 -9 0 -14" stroke="#c9b84a" stroke-width="2.4" fill="none" stroke-linecap="round"/></pattern>' +
+      '<pattern id="rdgach" width="56" height="35" patternUnits="userSpaceOnUse"><rect width="56" height="35" fill="#ece4d2"/><path d="M0 0 H56 M0 35 H56 M28 0 V35" stroke="#dccfb4" stroke-width="2"/></pattern>' +
+      '</defs>';
+    // Trời, mặt trời, mây, núi xa
+    s += '<rect width="2600" height="560" fill="url(#rdsky)"/><circle cx="2330" cy="110" r="58" fill="#fff3b0"/><circle cx="2330" cy="110" r="42" fill="#ffe066"/>';
+    s += '<g class="cloud c1"><ellipse cx="420" cy="100" rx="86" ry="28" fill="#fff"/><ellipse cx="470" cy="80" rx="52" ry="32" fill="#fff"/></g><g class="cloud c2"><ellipse cx="1300" cy="70" rx="96" ry="28" fill="#fff"/><ellipse cx="1250" cy="54" rx="52" ry="30" fill="#fff"/></g><g class="cloud c3"><ellipse cx="1900" cy="150" rx="74" ry="24" fill="#fff"/></g>';
+    s += '<g data-hit="poke" data-id="nui"><path d="M0 450 L150 250 L270 370 L430 170 L610 390 L770 235 L940 405 L1110 200 L1310 395 L1490 245 L1710 405 L1910 265 L2110 415 L2310 225 L2600 425 V540 H0Z" fill="#b3c1ee"/>' +
+      '<path d="M430 170 L470 222 L445 214 L428 236 L408 212 L392 224 Z M1110 200 L1150 250 L1124 244 L1108 264 L1090 240 L1074 250 Z M2310 225 L2350 278 L2326 270 L2310 290 L2292 268 L2276 280 Z" fill="#fff" opacity=".85"/>' +
+      '<path d="M0 480 Q220 340 450 462 Q660 350 920 462 Q1170 360 1420 466 Q1670 370 1920 462 Q2220 360 2600 452 V560 H0Z" fill="#9bd7a6"/>' +
+      '<path d="M0 510 Q300 420 620 500 Q960 420 1300 502 Q1640 430 1980 500 Q2300 440 2600 496 V580 H0Z" fill="#83cd92"/></g>';
+    for (i = 0; i < 13; i++) s += tree(70 + i * 205, 520, 30 + (i % 3) * 5, 'bg');
+    // Đồng lúa, trâu, cò, bù nhìn, ao sen, làng xóm (bên trái); mặt trước trường (bên phải)
+    s += '<rect y="515" width="2600" height="110" fill="#b6e07a"/>';
+    s += '<g data-hit="poke" data-id="lua"><path d="M0 528 H1640 V622 H0Z" fill="url(#rdlua)"/><path d="M250 528 L210 622 H520 L500 528Z M880 528 L900 622 H1190 L1130 528Z" fill="url(#rdchin)"/>' +
+      '<path d="M0 573 H1640 M250 528 L210 622 M500 528 L520 622 M880 528 L900 622 M1130 528 L1190 622 M1420 528 L1470 622" stroke="#8cbf5a" stroke-width="5" fill="none"/></g>';
+    s += smallHouse(985, 520, '#fff3c4', '#e76f51') + smallHouse(1090, 528, '#ffe0b5', '#c8553d') + smallHouse(1235, 518, '#e0fbfc', '#3d5a80') + palm(1160, 528, 78) + palm(930, 524, 64);
+    s += '<g data-hit="poke" data-id="tre" fill="none" stroke="#4fb36e" stroke-width="8" stroke-linecap="round"><path d="M40 622 Q30 540 52 470 M70 622 Q72 548 60 480 M100 622 Q110 556 96 496"/><path d="M52 470 q22 -6 34 8 M60 480 q-24 -4 -34 12 M96 496 q22 -8 36 6 M46 520 q-22 0 -30 16 M70 548 q24 -4 34 12" stroke-width="6" stroke="#6ccf8e"/></g>';
+    s += '<g data-hit="poke" data-id="trau" transform="translate(600 598)"><ellipse cx="0" cy="6" rx="62" ry="8" fill="#000" opacity=".12"/><rect x="-44" y="-24" width="12" height="30" rx="5" fill="#4a4458"/><rect x="26" y="-24" width="12" height="30" rx="5" fill="#4a4458"/>' +
+      '<ellipse cx="-4" cy="-34" rx="52" ry="26" fill="#5c5470"/><path d="M-54 -40 q-14 6 -10 26" stroke="#5c5470" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="-46" rx="22" ry="18" fill="#655d7a"/>' +
+      '<path d="M40 -60 Q26 -84 50 -88 M62 -60 Q82 -80 64 -90" stroke="#e9e4d8" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="57" cy="-48" r="3" fill="#fff"/><ellipse cx="66" cy="-38" rx="7" ry="5" fill="#8a8299"/></g>';
+    s += '<g data-hit="poke" data-id="cotrang"><g transform="translate(330 568)"><path d="M0 0 V-18" stroke="#f4a261" stroke-width="3"/><ellipse cx="0" cy="-26" rx="15" ry="9" fill="#fff"/><path d="M10 -30 Q20 -46 16 -52" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M16 -54 l14 3" stroke="#f4a261" stroke-width="3" stroke-linecap="round"/></g>' +
+      '<g transform="translate(820 556) scale(-.9 .9)"><path d="M0 0 V-18" stroke="#f4a261" stroke-width="3"/><ellipse cx="0" cy="-26" rx="15" ry="9" fill="#fff"/><path d="M10 -30 Q20 -46 16 -52" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M16 -54 l14 3" stroke="#f4a261" stroke-width="3" stroke-linecap="round"/></g></g>';
+    s += '<g data-hit="poke" data-id="bunhin" transform="translate(1330 604)"><path d="M0 0 V-74 M-30 -52 H30" stroke="#8d6e63" stroke-width="6" stroke-linecap="round"/><path d="M-26 -56 H26 L18 -20 H-18 Z" fill="#e76f51"/><circle cx="0" cy="-70" r="12" fill="#ffe8a3"/><path d="M-20 -78 L0 -98 L20 -78 Z" fill="#f2e2b0" stroke="#d9c38a" stroke-width="2"/></g>';
+    s += '<g data-hit="poke" data-id="aosen" transform="translate(1500 592)"><ellipse rx="92" ry="26" fill="#7fd0ee"/><ellipse cx="-34" cy="2" rx="22" ry="8" fill="#57c27a"/><ellipse cx="30" cy="-6" rx="18" ry="7" fill="#57c27a"/><path d="M-34 0 q-8 -16 0 -22 q8 6 0 22 M30 -8 q-7 -14 0 -20 q7 6 0 20" fill="#ff8fab"/></g>';
+    // Mặt trước trường: dãy nhà, hàng rào, cổng, biển tên, cột cờ
+    s += '<g id="rd-school"><rect x="1700" y="350" width="420" height="230" fill="#fff3c4"/><path d="M1680 358 L1910 270 L2140 358 Z" fill="#e07a3f"/>' + windowRow(1730, 392, 4, 96, 60, 50) + windowRow(1730, 478, 4, 96, 60, 50) +
+      '<rect x="2400" y="380" width="200" height="200" fill="#ffe7b0"/><path d="M2384 388 L2500 320 L2616 388 Z" fill="#d9692f"/>' + windowRow(2424, 420, 2, 86, 56, 48) +
+      tree(2180, 560, 44, 'bg') + tree(2345, 566, 40, 'bg') + tree(1660, 566, 44, 'bg') +
+      '<rect x="2436" y="386" width="7" height="200" fill="#adb5bd"/><g class="flag"><rect x="2443" y="390" width="62" height="42" fill="#da251d"/><path d="M2474 398 l3.6 11 h11.6 l-9.4 6.8 3.6 11 -9.4 -6.8 -9.4 6.8 3.6 -11 -9.4 -6.8 h11.6z" fill="#ffde00"/></g>' +
+      '<rect x="1650" y="566" width="520" height="56" fill="#fdf0d5"/><rect x="2330" y="566" width="270" height="56" fill="#fdf0d5"/><path d="M1650 566 H2170 M2330 566 H2600" stroke="#e9c46a" stroke-width="8"/>';
+    for (i = 0; i < 9; i++) s += '<rect x="' + (1650 + i * 62) + '" y="548" width="16" height="74" rx="3" fill="#e9c46a"/>';
+    for (i = 0; i < 5; i++) s += '<rect x="' + (2352 + i * 60) + '" y="548" width="16" height="74" rx="3" fill="#e9c46a"/>';
+    s += '<rect x="2170" y="560" width="160" height="64" fill="#f3e2c0"/><rect x="2150" y="470" width="34" height="154" rx="6" fill="#e9c46a"/><rect x="2316" y="470" width="34" height="154" rx="6" fill="#e9c46a"/>' +
+      '<path d="M2150 470 Q2250 410 2350 470" fill="none" stroke="#ffd166" stroke-width="12" stroke-linecap="round"/>' +
+      '<rect x="2076" y="418" width="348" height="54" rx="16" fill="#2a6f97" stroke="#fff" stroke-width="5"/><text x="2250" y="453" text-anchor="middle" class="w-label gate-text" font-size="22" fill="#fff">Trường Tiểu Học Tân Trường</text></g>';
+    // Vỉa hè phía xa, mặt đường, vạch sang đường, vỉa hè phía gần
+    s += '<rect y="620" width="2600" height="72" fill="url(#rdgach)"/><rect y="686" width="2600" height="8" fill="#b9b0a0"/>';
+    s += '<rect y="692" width="2600" height="204" fill="#6b7280"/><path d="M0 702 H2600 M0 886 H2600" stroke="#fff" stroke-width="4" opacity=".8"/><path d="M0 794 H1880 M2080 794 H2600" stroke="#fff" stroke-width="6" stroke-dasharray="46 34"/>';
+    for (i = 0; i < 8; i++) s += '<rect x="1900" y="' + (703 + i * 24) + '" width="160" height="14" rx="2" fill="#fff"/>';
+    s += '<rect x="1872" y="798" width="9" height="86" fill="#fff"/><rect x="2079" y="704" width="9" height="86" fill="#fff"/>';
+    s += '<rect y="896" width="2600" height="96" fill="url(#rdgach)"/><rect y="894" width="2600" height="8" fill="#b9b0a0"/>';
+    // Biển báo gần trường
+    s += '<g data-hit="poke" data-id="bienbao" transform="translate(1600 690)"><rect x="-4" y="-104" width="8" height="104" fill="#5c677d"/><path d="M0 -168 L40 -100 H-40 Z" fill="#ffd60a" stroke="#c1121f" stroke-width="7" stroke-linejoin="round"/>' +
+      '<circle cx="-8" cy="-134" r="5" fill="#2b2f3a"/><path d="M-8 -128 V-114 M-14 -106 L-8 -114 L-2 -106" stroke="#2b2f3a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="9" cy="-128" r="4" fill="#2b2f3a"/><path d="M9 -123 V-112" stroke="#2b2f3a" stroke-width="4" stroke-linecap="round"/></g>';
+    // Phía gần: cỏ, nhà của bé, trạm xe buýt, cây và bụi
+    s += '<rect y="990" width="2600" height="210" fill="#bfe8a0"/>';
+    s += '<g data-hit="poke" data-id="nha" transform="translate(250 1180)"><rect x="-150" y="-130" width="300" height="130" rx="6" fill="#ffe5ec"/><path d="M-176 -124 L0 -200 L176 -124 Z" fill="#e76f51"/><rect x="-176" y="-130" width="352" height="14" rx="5" fill="#c8553d"/>' +
+      '<rect x="-34" y="-84" width="60" height="84" rx="8" fill="#9c6644"/><circle cx="14" cy="-42" r="4" fill="#ffd166"/>' + '<rect x="-128" y="-96" width="66" height="54" rx="5" fill="#dff3ff" stroke="#fff" stroke-width="5"/><rect x="58" y="-96" width="66" height="54" rx="5" fill="#dff3ff" stroke="#fff" stroke-width="5"/>' +
+      '<g transform="translate(0 -214)"><rect x="-66" y="-22" width="132" height="34" rx="12" fill="#fff" stroke="#3b2f63" stroke-opacity=".15" stroke-width="3"/><text y="2" text-anchor="middle" class="w-label" font-size="20" fill="#3b2f63">Nhà của con</text></g></g>';
+    s += '<path d="M240 1050 Q250 1010 300 992" stroke="#f3e2c0" stroke-width="46" fill="none" stroke-linecap="round"/>';
+    s += '<g data-hit="poke" data-id="xebuyt" transform="translate(1180 1090)"><rect x="-90" y="-96" width="180" height="12" rx="5" fill="#3d5a80"/><rect x="-84" y="-86" width="8" height="86" fill="#5c677d"/><rect x="76" y="-86" width="8" height="86" fill="#5c677d"/>' +
+      '<rect x="-70" y="-30" width="140" height="12" rx="5" fill="#c68b59"/><rect x="-62" y="-18" width="8" height="18" fill="#8d6e63"/><rect x="54" y="-18" width="8" height="18" fill="#8d6e63"/>' +
+      '<rect x="-64" y="-80" width="128" height="34" rx="6" fill="#e0fbfc"/><text y="-56" text-anchor="middle" class="w-label" font-size="17" fill="#1d4e89">Trạm xe buýt</text></g>';
+    s += tree(560, 1130, 58, 'shade') + tree(900, 1160, 50, 'shade', '#ff9f1c') + tree(1520, 1140, 56, 'shade') + tree(2330, 1150, 58, 'shade') + flowerBed(700, 1040, 150) + flowerBed(1700, 1050, 150) +
+      bush(60, 1185, 60) + bush(1340, 1190, 60) + bush(1960, 1185, 70) + bush(2540, 1190, 60) + butterfly(690, 1010, '#f15bb5') + butterfly(1690, 1016, '#ffd166', 'f2') +
+      bird(1010, 1002, '#ffb703') + bird(2120, 1004, '#8ecae6', true, 'b2') + skyBird(0, 200, 0.9) + skyBird(0, 120, 0.7, 's2');
+    return s;
+  }
+  /* Cột đèn giao thông xếp theo chiều sâu cùng nhân vật và xe cộ */
+  function roadProps() {
+    return [
+      { y: 690, s: trafficPole(1886, 690, false, true) }, { y: 691, s: trafficPole(2104, 690, true, false) },
+      { y: 902, s: trafficPole(1858, 902, true, false) }, { y: 903, s: trafficPole(2076, 902, false, true) }
+    ];
+  }
+
   TT.art = {
-    girlBack: girlBack, kidSeat: kidSeat, bird: bird, yardProps: yardProps,
+    girlBack: heroBack, kidSeat: kidSeat, roadScene: roadScene, roadProps: roadProps, vehicle: vehicle, ROAD: ROAD, bird: bird, yardProps: yardProps,
     classroomScene: classroomScene, classroomProps: classroomProps, ROOM: ROOM, DESKS: DESKS,
-    svg: svg, girl: girl, kid: kid, adult: adult, pet: pet, PET_NAMES: PET_NAMES, PET_ACC: PET_ACC,
+    svg: svg, girl: hero, kid: kid, adult: adult, pet: pet, PET_NAMES: PET_NAMES, PET_ACC: PET_ACC,
     obj: obj, OBJ: OBJ, CONTEXTS: CONTEXTS, DECOR: DECOR, decor: decor, icon: icon, ICON: ICON,
     schoolScene: schoolScene, WORLD: WORLD, tree: tree, bush: bush, flowerBed: flowerBed,
-    girlSVG: function (o, cls) { return svg('0 0 120 200', girl(o), cls || 'char'); },
+    girlSVG: function (o, cls) { return svg('0 0 120 200', hero(o), cls || 'char'); },
     kidSVG: function (n, i, cls) { return svg('0 0 120 200', kid(n, i), cls || 'char'); },
     adultSVG: function (k, cls) { return svg('0 0 120 220', adult(k), cls || 'char'); },
     petSVG: function (k, a, cls) { return svg('0 0 100 100', pet(k, a), cls || 'pet'); }

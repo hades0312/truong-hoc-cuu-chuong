@@ -1,7 +1,7 @@
 # Trường học cửu chương
 
-Game nhỏ cho các bạn tiểu học vừa chơi vừa học: luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia) và học Toán, Khoa học, Tiếng Anh lớp 4.
-Bé tự tạo nhân vật mang tên mình, đeo ba lô đi qua cổng trường, vào lớp, lên bảng, rồi học và luyện qua các trò chơi.
+Game nhỏ cho các bạn tiểu học vừa chơi vừa học: luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia), học Toán, Khoa học, Tiếng Anh lớp 4 và kỹ năng sống (an toàn giao thông, ăn uống an toàn).
+Bé tự tạo nhân vật mang tên mình, đeo ba lô đi dọc đường làng, chờ đèn xanh sang đường, qua cổng trường, vào lớp, lên bảng, rồi học và luyện qua các trò chơi.
 
 **Chơi ngay: <https://congai.lamphong.info>**
 
@@ -21,7 +21,41 @@ Game chỉ là các file tĩnh (HTML, CSS, JavaScript), không có máy chủ ph
 | ![Xây cầu](screenshots/10-xay-cau.png) **Xây cầu:** mỗi câu đúng đặt thêm một tấm ván. | ![Phần thưởng](screenshots/11-phan-thuong.png) **Phần thưởng:** ngôi sao và bánh cho thú sau mỗi nhiệm vụ. |
 | ![Trang trí đảo](screenshots/12-trang-tri-dao.png) **Trang trí đảo:** đổi ngôi sao lấy đồ trang trí. | ![Thú cưng](screenshots/13-thu-cung.png) **Thú đồng hành:** mèo Mít, thỏ Bông, rồng nhỏ Đậu. |
 
-Ngoài ra còn có thư viện ghép thẻ, nhà ăn chia phần (phép chia), bảng tin với nhiệm vụ mỗi ngày, và phần "Ôn lại" tự chọn những phép tính bé hay sai.
+Ngoài ra còn có thư viện ghép thẻ, bảng tin với nhiệm vụ mỗi ngày, và phần "Ôn lại" tự chọn những phép tính bé hay sai.
+
+### Đường tới trường
+
+Trước khi vào trường, bé đi từ nhà dọc con đường làng: núi xa, đồng lúa, con trâu, đàn cò, làng xóm, rồi tới đoạn đường có xe cộ và đèn giao thông trước cổng trường.
+
+![Đường tới trường](screenshots/23-duong-toi-truong.png)
+
+| | |
+| --- | --- |
+| ![Chờ đèn xanh](screenshots/24-cho-den-xanh.png) **Đèn đỏ:** bé đứng trên vỉa hè chờ, không bước xuống đường được. | ![Sang đường](screenshots/25-sang-duong.png) **Đèn xanh:** nhìn hai bên rồi đi trên vạch kẻ đường, xe dừng trước vạch. |
+
+- **Đèn giao thông:** đèn cho người đi bộ đỏ thì bé không bước xuống đường được và được nhắc đứng chờ. Đèn xanh thì sang đường trên vạch kẻ. Xe cộ luôn dừng trước vạch khi bé còn ở trên đường. Sang đường đúng luật lần đầu mỗi ngày được thưởng một ngôi sao.
+- **Chú Cảnh sát** dạy an toàn giao thông (22 câu), **bác nông dân** kể chuyện đồng ruộng.
+- Từ sân trường có thể **ra đường** lại qua cổng; ai vội thì bấm "Vào trường" ở thanh Đi nhanh.
+
+### Tham quan trường
+
+Chạm bảng **Sơ đồ trường** gần cổng (hoặc "Tham quan trường" ở thanh Đi nhanh): cô giáo dẫn bé đi lần lượt 10 điểm trong sân trường và kể vài câu ở mỗi nơi. Cuối chuyến là phần **Trường em, quê em** về xã Trường Lâm, tỉnh Thanh Hoá, kèm 12 câu đố vui.
+
+![Tham quan trường](screenshots/28-tham-quan-truong.png)
+
+Ngôi trường trong game được vẽ theo tưởng tượng. Phần quê hương chỉ gồm thông tin đã đối chiếu với Wikipedia tiếng Việt (2024–2025). Thông tin riêng về trường thật (năm thành lập, số lớp…) chưa có nguồn công khai: ba mẹ, thầy cô thêm vào mục `SCHOOL` trong `js/tour.js` thì game sẽ hiện ra. Nhà khác dùng lại game thì sửa `js/tour.js` theo trường mình.
+
+### Khám phá trong trường
+
+- **Chạm vào cảnh vật:** lá cờ, cây, ghế đá, bồn hoa, đồng hồ, vòi rửa tay, thùng rác, con trâu, ao sen, biển báo… mỗi thứ có vài câu để bé đọc, mỗi lần chạm một câu khác.
+- **Trò chuyện:** mỗi thầy cô và bạn học có 8–12 câu khác nhau.
+- **Nhà ăn:** cô Tâm dạy ăn uống an toàn (22 câu): không ăn quà vặt không rõ nguồn gốc, xem hạn sử dụng, rửa tay, ăn đủ chất. Bật phép chia trong Góc ba mẹ thì có thêm trò chia phần bánh.
+- **Phòng Mỹ thuật:** tô màu nhân vật (tóc, áo, váy hoặc quần, giày, ba lô, kiểu tóc, phụ kiện) và trang trí đảo.
+- **Hướng dẫn chơi:** nút "Hướng dẫn" ở cổng trường và trong thanh Đi nhanh, có đọc thành tiếng.
+
+| | |
+| --- | --- |
+| ![Tô màu nhân vật](screenshots/26-to-mau-nhan-vat.png) **Tô màu nhân vật:** nhìn từ trước và từ sau lưng, đổi màu là thấy ngay. | ![Hướng dẫn chơi](screenshots/27-huong-dan-choi.png) **Hướng dẫn chơi:** chín mục ngắn cho bé tự đọc hoặc nghe đọc. |
 
 ### Các môn học lớp 4
 
@@ -105,10 +139,11 @@ Tên trong bản này là tên các bạn cùng lớp của con mình. Để đ�
 | Bạn nào là nam (để vẽ đúng hình) | Danh sách `BOYS` trong `js/art.js`; ai không có trong đó sẽ vẽ hình bạn nữ |
 | Hai nhân vật có sẵn | `CHARACTERS` trong `js/storage.js` |
 | Tên cô giáo | Tìm và thay chữ `Hằng` trong các file ở `js/` |
-| Câu hỏi Khoa học, Tiếng Anh | Thêm, sửa các câu trong `js/bank-science.js`, `js/bank-english.js` (mỗi câu gồm câu hỏi `q`, đáp án đúng `a`, các đáp án sai `wrong`, lời giải thích `why`) |
-| Thầy cô, chú bảo vệ ngoài sân | Danh sách `NPCS` trong `js/world.js` |
+| Câu hỏi Khoa học, Tiếng Anh, Kỹ năng sống | Thêm, sửa các câu trong `js/bank-science.js`, `js/bank-english.js`, `js/bank-life.js` (mỗi câu gồm câu hỏi `q`, đáp án đúng `a`, các đáp án sai `wrong`, lời giải thích `why`) |
+| Thầy cô, chú bảo vệ ngoài sân | Danh sách `NPCS` trong `js/world.js`; lời thoại ở `npcLines` trong `js/activities.js` |
+| Chuyến tham quan, phần quê hương | `STOPS`, `HOME`, `SCHOOL` trong `js/tour.js` |
 | Tên trường trên cổng | Tìm `Tân Trường` trong `js/art.js`, `js/world.js`, `manifest.webmanifest` |
-| Biển tên các lớp | Tìm `Lớp 4A` trong `js/art.js` |
+| Biển tên các lớp | Tìm `Lớp 4E` trong `js/art.js` |
 
 Mỗi ngày game chọn ngẫu nhiên 4 bạn đứng ngoài sân và 10 bạn ngồi trong lớp từ danh sách, nên danh sách cần ít nhất 15 tên.
 
@@ -121,7 +156,7 @@ Game chỉ gồm file tĩnh nên đặt ở đâu cũng được, miễn là có
 
 Hai việc cần nhớ khi tự đăng:
 
-- **Mỗi lần sửa file, tăng số phiên bản ở hai chỗ:** `CACHE` ở đầu `sw.js` (ví dụ `tientien-v10` → `tientien-v11`) và số `?v=` trong `index.html` (tìm `?v=10`, thay tất cả thành `?v=11`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
+- **Mỗi lần sửa file, tăng số phiên bản ở hai chỗ:** `CACHE` ở đầu `sw.js` (ví dụ `tientien-v11` → `tientien-v12`) và số `?v=` trong `index.html` (tìm `?v=11`, thay tất cả thành `?v=12`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
 - **Game tự cập nhật:** vì game được lưu sẵn trong máy để chơi offline, mỗi lần mở lại (và mỗi 30 phút khi đang mở) trang sẽ hỏi máy chủ xem có bản mới. Có bản mới thì game tự tải lại ở màn hình cổng trường; nếu bé đang chơi dở, game chờ tới khi bé về cổng trường rồi mới cập nhật, tiến độ không mất.
 - Đổi tên miền trong các thẻ `og:url` và `og:image` ở đầu `index.html` thành địa chỉ của bạn, để link chia sẻ lên mạng xã hội hiện đúng ảnh.
 
@@ -134,11 +169,12 @@ Không dùng thư viện ngoài, không cần bước build. Hình vẽ là SVG 
 - `js/storage.js` — hồ sơ riêng cho từng nhân vật (hai bạn có sẵn và các nhân vật bé tự tạo, tối đa 8), danh sách bạn cùng lớp
 - `js/art.js` — toàn bộ hình vẽ: sân trường, lớp học, nhân vật nhìn từ trước và sau, thú, chim, đồ vật
 - `js/audio.js` — hiệu ứng, tiếng chim và âm thanh nền theo cảnh, giọng đọc tiếng Việt
-- `js/world.js` — các cảnh đi lại được: bàn phím, chuột, nút điều hướng, vật cản, tìm đường
+- `js/world.js` — các cảnh đi lại được (đường tới trường, sân trường, lớp học): bàn phím, chuột, nút điều hướng, vật cản, tìm đường, xe cộ và đèn giao thông, cảnh vật chạm vào được
 - `js/quiz.js` — bộ chạy nhiệm vụ, gợi ý hai mức, hỏi lại câu sai
+- `js/tour.js` — nội dung chuyến tham quan trường và phần quê hương em
 - `js/subjects.js` — các môn học lớp 4: chọn câu, chạy lượt trắc nghiệm, ghi tiến độ
-- `js/bank-math.js`, `js/bank-science.js`, `js/bank-english.js` — ngân hàng câu hỏi Toán (sinh đề ngẫu nhiên), Khoa học, Tiếng Anh
-- `js/activities.js` — bảng lớp, thư viện, bảng tin, mỹ thuật, thú cưng, đảo
+- `js/bank-math.js`, `js/bank-science.js`, `js/bank-english.js`, `js/bank-life.js` — ngân hàng câu hỏi Toán (sinh đề ngẫu nhiên), Khoa học, Tiếng Anh, Kỹ năng sống (an toàn giao thông, ăn uống an toàn)
+- `js/activities.js` — bảng lớp, thư viện, bảng tin, tô màu nhân vật, trang trí đảo, thú cưng, hướng dẫn chơi, lời thoại
 - `js/visual.js` — hình nhóm đồ vật và bảng chấm
 - `js/install.js` — nút "Cài app" cho từng loại thiết bị
 - `js/external.js` — chuyển sang trình duyệt thật khi link được mở trong Facebook, Zalo…

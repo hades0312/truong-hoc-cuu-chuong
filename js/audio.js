@@ -139,7 +139,9 @@
       whistle([[0, 2050], [0.05, 2250], [0.1, 2050], [0.15, 2250], [0.2, 2050], [0.3, 2150]], 0, v * 0.35, { type: 'square', dest: o.dest, pan: o.pan });
     },
     splash: function (v, o) { hiss(0, 0.5, v * 1.1, { filter: 'lowpass', freq: 1800, to: 450, dest: o.dest, pan: o.pan, attack: 0.05 }); },
-    pet: function (v, o) { petVoice(amb.pet || 'mit', v * 1.2, o); }
+    pet: function (v, o) { petVoice(amb.pet || 'mit', v * 1.2, o); },
+    horn: function (v, o) { tone(440, 0, 0.2, 'square', v * 0.3, { dest: o.dest, pan: o.pan }); tone(554, 0, 0.2, 'square', v * 0.25, { dest: o.dest, pan: o.pan }); },   // còi xe ở xa
+    bikebell: function (v, o) { tone(2400, 0, 0.3, 'sine', v * 0.7, { dest: o.dest, pan: o.pan, attack: 0.003 }); tone(2400, 0.16, 0.4, 'sine', v * 0.6, { dest: o.dest, pan: o.pan, attack: 0.003 }); } // chuông xe đạp
   };
 
   function petVoice(kind, v, o) {
@@ -211,7 +213,11 @@
       for (var i = 0; i < 6; i++) hiss(i * 0.055, 0.04, 0.04 - i * 0.004, { freq: 1700, q: 2 });
       BIRDS.tweet(0.05, 0.05);
     },
-    bird: function () { BIRDS[pick(['se', 'chich', 'tweet', 'trill'])](0, 0.07); }
+    bird: function () { BIRDS[pick(['se', 'chich', 'tweet', 'trill'])](0, 0.07); },
+    splash: function () { hiss(0, 0.4, 0.06, { filter: 'lowpass', freq: 2200, to: 500, attack: 0.03 }); },
+    ding: function () { tone(1320, 0, 0.25, 'sine', 0.09, { attack: 0.004 }); tone(1760, 0.14, 0.4, 'sine', 0.08, { attack: 0.004 }); }, // đèn xanh cho người đi bộ
+    moo: function () { whistle([[0, 150], [0.25, 190], [0.8, 135]], 0, 0.09, { type: 'sawtooth' }); },                                 // nghé ọ
+    horn: function () { tone(440, 0, 0.22, 'square', 0.025); tone(554, 0, 0.22, 'square', 0.02); }
   };
 
   function play(name) {
@@ -228,6 +234,7 @@
    * muffle: tiếng chim vọng qua cửa sổ nên trầm và nhỏ hơn. */
   var AMB = {
     title: { vol: 1, bed: 'wind', gap: [1.1, 3.2], ev: [['se', 4], ['chich', 3], ['tweet', 2], ['cu', 1], ['music', 3]] },
+    road: { vol: 1, bed: 'wind', gap: [1.1, 3.2], ev: [['se', 4], ['chich', 3], ['cu', 3], ['tweet', 2], ['horn', 1], ['bikebell', 1], ['music', 1]] },
     yard: { vol: 1, bed: 'wind', gap: [1, 3], ev: [['se', 5], ['chich', 4], ['trill', 2], ['cu', 2], ['tweet', 2], ['music', 2]] },
     classroom: { vol: 0.8, bed: 'room', tick: true, muffle: 2600, gap: [2.4, 6], ev: [['se', 3], ['cu', 2], ['chich', 2]] },
     library: { vol: 0.6, bed: 'room', tick: true, muffle: 1800, gap: [4, 9], ev: [['cu', 2], ['page', 3], ['se', 1]] },

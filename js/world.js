@@ -13,11 +13,29 @@
     { id: 'library', name: 'Thư viện', icon: 'library', mx: 1880, my: 570, tx: 1880, ty: 720, face: 'up' },
     { id: 'garden', name: 'Vườn toán học', icon: 'garden', mx: 2225, my: 790, tx: 2140, ty: 1070 },
     { id: 'sports', name: 'Sân thể thao', icon: 'sports', mx: 2140, my: 1265, tx: 1960, ty: 1200 },
-    { id: 'canteen', name: 'Nhà ăn', icon: 'canteen', mx: 345, my: 880, tx: 320, ty: 1020, needDiv: true },
+    { id: 'canteen', name: 'Nhà ăn', icon: 'canteen', mx: 345, my: 880, tx: 320, ty: 1020 },
     { id: 'art', name: 'Phòng Mỹ thuật', icon: 'art', mx: 530, my: 580, tx: 530, ty: 720, face: 'up' },
     { id: 'pets', name: 'Góc thú cưng', icon: 'pets', mx: 450, my: 1200, tx: 600, ty: 1190 },
     { id: 'board', name: 'Bảng tin', icon: 'board', mx: 975, my: 700, tx: 975, ty: 880, face: 'up' },
-    { id: 'portal', name: 'Đảo thú cưng', icon: 'island', mx: 760, my: 1320, tx: 760, ty: 1400 }
+    { id: 'portal', name: 'Đảo thú cưng', icon: 'island', mx: 760, my: 1320, tx: 760, ty: 1400 },
+    { id: 'road', name: 'Ra đường', icon: 'walk', mx: 1250, my: 1338, tx: 1250, ty: 1410 },
+    { id: 'tour', name: 'Tham quan trường', icon: 'map', mx: 1105, my: 1094, tx: 1105, ty: 1250, pill: true, face: 'up' }
+  ];
+
+  /* Đường tới trường: chỉ có một nơi để vào là cổng trường; còn lại là người và cảnh vật để trò chuyện */
+  var ROAD_ZONES = [
+    { id: 'rd-gate', name: 'Vào trường', icon: 'classroom', mx: 2250, my: 540, tx: 2250, ty: 650, face: 'up' }
+  ];
+  var ROAD_NPCS = [
+    { id: 'congan', name: 'Chú Cảnh sát', kind: 'adult', art: 'congan', x: 1790, y: 958 },
+    { id: 'nong', name: 'Bác nông dân', kind: 'adult', art: 'nong', x: 760, y: 662 }
+  ];
+  var CROSS = [1900, 692, 2060, 895];   // vạch sang đường
+  /* Chu kì đèn: xe đi → đèn vàng → tất cả dừng → người đi bộ sang → sắp hết giờ (đèn xanh nhấp nháy) */
+  var PHASES = [{ id: 'go', dur: 7 }, { id: 'slow', dur: 2 }, { id: 'stop', dur: 1.2 }, { id: 'walk', dur: 8, open: true }, { id: 'hurry', dur: 3, open: true }];
+  var TRAFFIC = [ // lane 0: làn xa, xe chạy sang trái · lane 1: làn gần, xe chạy sang phải
+    { k: 'car', c: '#ef476f', lane: 0, v: 215 }, { k: 'moto', c: '#118ab2', lane: 0, v: 240 }, { k: 'truck', c: '#06d6a0', lane: 0, v: 165 },
+    { k: 'bus', c: '#ffd166', lane: 1, v: 175 }, { k: 'car', c: '#4dabf7', lane: 1, v: 220 }, { k: 'moto', c: '#9b5de5', lane: 1, v: 245 }, { k: 'car', c: '#ff9f1c', lane: 1, v: 200 }
   ];
 
   /* Trong lớp: nhãn dạng thẻ nhỏ đặt ngay trên đồ vật. seat: chỗ ngồi của bạn nhỏ. */
@@ -34,6 +52,7 @@
     { id: 'nam', name: 'Thầy Nam', kind: 'adult', art: 'nam', x: 1520, y: 925 },
     { id: 'hoa', name: 'Cô Hoa', kind: 'adult', art: 'hoa', x: 1760, y: 705 },
     { id: 'lan', name: 'Cô Lan', kind: 'adult', art: 'lan', x: 885, y: 990 },
+    { id: 'tam', name: 'Cô Tâm', kind: 'adult', art: 'tam', x: 500, y: 990 },
     { id: 'k0', kind: 'kid', idx: 0, x: 2010, y: 1030 },
     { id: 'k1', kind: 'kid', idx: 1, x: 1880, y: 1350 },
     { id: 'k2', kind: 'kid', idx: 2, x: 720, y: 960 },
@@ -54,9 +73,16 @@
         [70, 1105, 550, 1150], [392, 1238, 508, 1322],              // hàng rào và nhà của thú cưng
         [2030, 945, 2282, 980], [2124, 846, 2156, 866], [2222, 836, 2258, 856], [2314, 856, 2346, 876], // vườn
         [1000, 1236, 1070, 1421], [1430, 1236, 1500, 1421],         // trụ cổng
-        [870, 1380, 992, 1421], [1508, 1380, 1632, 1421], [1568, 1296, 1712, 1402] // bồn hoa cổng, chòi bảo vệ
+        [870, 1380, 992, 1421], [1508, 1380, 1632, 1421], [1568, 1296, 1712, 1402], // bồn hoa cổng, chòi bảo vệ
+        [1050, 1190, 1160, 1222]                                                    // bảng sơ đồ trường
       ],
       label: 'Sân Trường Tiểu Học Tân Trường. Dùng phím mũi tên để đi, Enter để vào nơi đang đứng gần.'
+    },
+    road: {
+      w: 2600, h: 1200, walk: { x0: 80, x1: 2520, y0: 632, y1: 985 }, start: { x: 470, y: 950 },
+      speed: 440, camDy: 130, bg: '#bfe8a0', top: '#8fd3ff', step: 'step', zones: ROAD_ZONES, depth: true, flock: [],
+      blocks: [[-200, 692, 1900, 895], [2060, 692, 2800, 895]], // mặt đường: chỉ sang được ở vạch kẻ
+      label: 'Đường tới trường. Đi dọc vỉa hè tới vạch sang đường, chờ đèn xanh cho người đi bộ rồi sang đường vào cổng trường.'
     },
     classroom: {
       w: 1600, h: 1000, walk: { x0: 70, x1: 1530, y0: 470, y1: 975 }, start: { x: 1450, y: 500 },
@@ -102,13 +128,13 @@
   function hotspotSvg(z) {
     if (z.pill) {
       var w = z.name.length * 14 + 74;
-      return '<g class="hotspot pill" data-hit="zone" data-id="' + z.id + '" transform="translate(' + z.mx + ' ' + z.my + ')">' +
+      return '<g class="hotspot pill" style="color:#7b61ff" data-hit="zone" data-id="' + z.id + '" transform="translate(' + z.mx + ' ' + z.my + ')">' +
         '<rect class="hs-ring" x="' + (-w / 2 - 5) + '" y="-27" width="' + (w + 10) + '" height="54" rx="27"/>' +
         '<rect class="hs-box" x="' + (-w / 2) + '" y="-22" width="' + w + '" height="44" rx="22" fill="#fff" stroke="#7b61ff" stroke-width="4"/>' +
         '<g transform="translate(' + (-w / 2 + 9) + ' -16)">' + A.ICON[z.icon] + '</g>' +
         '<text x="' + (-w / 2 + 49) + '" y="7" class="w-label" font-size="21" fill="#3b2f63">' + z.name + '</text></g>';
     }
-    return '<g class="hotspot" data-hit="zone" data-id="' + z.id + '" transform="translate(' + z.mx + ' ' + z.my + ')">' +
+    return '<g class="hotspot" style="color:#7b61ff" data-hit="zone" data-id="' + z.id + '" transform="translate(' + z.mx + ' ' + z.my + ')">' +
       '<circle r="46" class="hs-ring"/><circle class="hs-box" r="38" fill="#fff" stroke="#7b61ff" stroke-width="5"/>' +
       '<g transform="translate(-24 -24) scale(1.5)">' + A.ICON[z.icon] + '</g>' +
       '<g transform="translate(0 72)"><rect x="' + (-z.name.length * 8.4 - 16) + '" y="-24" width="' + (z.name.length * 16.8 + 32) + '" height="38" rx="19" fill="#7b61ff"/>' +
@@ -116,7 +142,7 @@
   }
 
   function yardContent(p) {
-    var list = A.yardProps().map(function (o) { return { y: o.y, s: wrap(o.y, 'prop', '', o.s) }; });
+    var list = A.yardProps().map(function (o) { return { y: o.y, s: wrap(o.y, 'prop', o.poke ? ' data-hit="poke" data-id="' + o.poke + '"' : '', o.s) }; });
     NPCS.forEach(function (n) { list.push({ y: n.y, s: npcSvg(n, p) }); });
     // Thú không đi cùng thì ở góc thú cưng
     var penPos = [[170, 1300], [270, 1360], [380, 1330]], pi = 0;
@@ -132,6 +158,98 @@
       list.push({ y: f[1], s: wrap(f[1], 'gbird', ' data-i="' + i + '"', A.bird(f[0], f[1], colors[i % colors.length], i % 2 === 1, i % 2 ? 'b2' : '')) });
     });
     return { ground: A.schoolScene({ noProps: true }), actors: list, npcs: NPCS };
+  }
+
+  function roadContent(p) {
+    var list = A.roadProps().map(function (o) { return { y: o.y, s: wrap(o.y, 'prop', '', o.s) }; });
+    ROAD_NPCS.forEach(function (n) { list.push({ y: n.y, s: npcSvg(n, p) }); });
+    st.sim = { t: 0, pi: 0, warned: false, side: 'near', crossed: false, cars: [] };
+    var next = [2500, -300]; // chỗ xuất phát của xe tiếp theo ở mỗi làn
+    TRAFFIC.forEach(function (d, i) {
+      var v = A.vehicle(d.k, d.c), y = d.lane ? 884 : 776, dir = d.lane ? 1 : -1;
+      var x = next[d.lane]; next[d.lane] += -dir * (v.len + 260 + i * 37 % 190);
+      st.sim.cars.push({ i: i, x: x, len: v.len, dir: dir, vmax: d.v, lane: d.lane, y: y, drawn: null });
+      list.push({ y: y, s: wrap(y, 'veh', ' data-i="' + i + '"', v.s) });
+    });
+    return { ground: A.roadScene(), actors: list, npcs: ROAD_NPCS };
+  }
+
+  /* Xe cộ và đèn giao thông trên đường tới trường. Xe luôn dừng trước vạch khi đèn của xe không xanh
+   * hoặc khi bé còn ở trên vạch sang đường, nên không bao giờ có va chạm. */
+  function roadUpdate(dt) {
+    var sim = st.sim, p = st.player, ph = PHASES[sim.pi];
+    sim.t += dt;
+    if (sim.t > ph.dur) {
+      sim.t = 0; sim.pi = (sim.pi + 1) % PHASES.length; ph = PHASES[sim.pi]; sim.warned = false;
+      st.el.world.setAttribute('data-light', ph.id);
+      if (ph.id === 'walk' && nearCross(p)) { TT.audio.play('ding'); bubble('Đèn xanh rồi! Nhìn hai bên, rồi đi trên vạch kẻ đường nhé.'); }
+    }
+    st.gate = ph.open ? null : CROSS; // đèn đỏ: không bước xuống đường được
+    if (!ph.open && !sim.warned && nearCross(p)) { sim.warned = true; bubble('Đèn đỏ rồi! Mình đứng trên vỉa hè chờ đèn xanh nhé.'); }
+    var onRoad = p.y > 694 && p.y < 893;
+    // sang tới vỉa hè bên kia: lần đầu được khen
+    var side = p.y >= 893 ? 'near' : (p.y <= 694 ? 'far' : sim.side);
+    if (side !== sim.side) { sim.side = side; if (!sim.crossed) { sim.crossed = true; if (st.opts.onEvent) st.opts.onEvent('crossed'); } }
+
+    var stop = ph.id !== 'go' || onRoad, cars = sim.cars, i, j;
+    for (i = 0; i < cars.length; i++) {
+      var c = cars[i], front = c.dir > 0 ? c.x + c.len : c.x, room = 1e9;
+      var toLine = c.dir > 0 ? 1868 - front : front - 2092;      // khoảng cách tới vạch dừng
+      if (stop && toLine >= 0) room = toLine;
+      for (j = 0; j < cars.length; j++) {                          // giữ khoảng cách với xe phía trước cùng làn
+        var o = cars[j];
+        if (o === c || o.lane !== c.lane) continue;
+        var gap = c.dir > 0 ? o.x - front : front - (o.x + o.len);
+        if (gap >= -10 && gap - 46 < room) room = Math.max(0, gap - 46);
+      }
+      var move = Math.min(Math.min(c.vmax, room * 3 + 6) * dt, room);
+      if (move > 0.05) c.x += c.dir * move;
+      // ra khỏi cảnh thì quay lại từ đầu bên kia, sau xe cuối cùng của làn
+      if (c.dir > 0 && c.x > 2760) { c.x = Math.min.apply(null, cars.filter(function (q) { return q.lane === c.lane; }).map(function (q) { return q.x; }).concat([-200])) - c.len - 240 - Math.random() * 200; }
+      if (c.dir < 0 && c.x + c.len < -160) { c.x = Math.max.apply(null, cars.filter(function (q) { return q.lane === c.lane; }).map(function (q) { return q.x + q.len; }).concat([2800])) + 240 + Math.random() * 200; }
+      var key = c.x.toFixed(1);
+      if (key !== c.drawn) {
+        c.drawn = key;
+        if (!c.el) c.el = st.el.actors.querySelector('.veh[data-i="' + c.i + '"]');
+        c.el.setAttribute('transform', c.dir > 0 ? 'translate(' + key + ' ' + c.y + ')' : 'translate(' + (c.x + c.len).toFixed(1) + ' ' + c.y + ') scale(-1 1)');
+      }
+    }
+  }
+  function nearCross(p) {
+    return p.x > 1880 && p.x < 2080 && ((p.y >= 893 && p.y < 962) || (p.y > 636 && p.y <= 694));
+  }
+
+  /* ---------------- Cảnh vật chạm vào được ----------------
+   * Chạm vào cây, lá cờ, vòi rửa tay, con trâu… bạn nhỏ sẽ nói một câu (mỗi lần một câu khác). */
+  var POKES = {
+    co: { lines: ['Lá cờ đỏ sao vàng tung bay! Sáng thứ Hai đầu tuần cả trường chào cờ.', 'Quốc kỳ Việt Nam có nền đỏ và ngôi sao vàng năm cánh.'] },
+    cay: { lines: ['Cây bàng cho bóng mát cả sân trường.', 'Cây xanh tạo ra khí ô-xi cho chúng mình thở đấy!', 'Mình không bẻ cành, hái lá nhé.'] },
+    ghe: { lines: ['Ghế đá mát quá! Ngồi nghỉ một chút rồi học tiếp.', 'Giờ ra chơi các bạn hay ngồi đây đọc truyện.'] },
+    cayqua: { lines: ['Cây trong vườn đang sai quả. Vào Vườn toán học để hái nhé!', 'Quả chín có nhiều vi-ta-min, ăn vào khoẻ người.'] },
+    hoa: { lines: ['Hoa thơm quá! Mình ngắm thôi, không hái nhé.', 'Bướm đang hút mật trên hoa kìa!', 'Mỗi sáng các bạn trực nhật tưới hoa đấy.'] },
+    dongho: { lines: [function () { var d = new Date(); return 'Đồng hồ chỉ ' + d.getHours() + ' giờ ' + d.getMinutes() + ' phút.'; }, 'Tùng… tùng… tùng! Trống trường báo giờ vào lớp.'] },
+    ruatay: { sfx: 'splash', lines: ['Rửa tay bằng xà phòng trước khi ăn và sau khi đi vệ sinh nhé!', 'Lúc xoa xà phòng thì khoá vòi lại để tiết kiệm nước.'] },
+    thungrac: { lines: ['Bỏ rác đúng thùng: thùng xanh đựng rác hữu cơ, thùng vàng đựng rác tái chế.', 'Sân trường sạch đẹp là nhờ không ai xả rác bừa bãi.'] },
+    chot: { lines: ['Đây là chốt bảo vệ của chú Bình. Chú giữ cho trường mình an toàn.'] },
+    nui: { lines: ['Núi non trập trùng phía xa. Trên đỉnh núi cao trời rất lạnh.', 'Rừng trên núi là nhà của rất nhiều loài chim thú.'] },
+    lua: { lines: ['Cánh đồng lúa xanh mướt! Hạt gạo mình ăn hằng ngày là từ cây lúa đấy.', 'Lúa chín vàng óng thì bác nông dân gặt về.'] },
+    trau: { sfx: 'moo', lines: ['Nghé ọ! Con trâu giúp bác nông dân cày ruộng.', 'Trâu ăn cỏ. Cỏ → trâu cũng là một mắt xích của chuỗi thức ăn.'] },
+    cotrang: { lines: ['Đàn cò trắng đang bắt tôm tép ngoài đồng.', '"Con cò bay lả bay la, bay từ cửa phủ bay ra cánh đồng…"'] },
+    bunhin: { lines: ['Bù nhìn rơm đứng canh cho chim khỏi ăn thóc.'] },
+    aosen: { lines: ['Ao sen thơm ngát. Hoa sen được coi là quốc hoa của Việt Nam.', 'Không chơi gần ao hồ khi không có người lớn đi cùng nhé!'] },
+    tre: { lines: ['Luỹ tre làng xanh mát quanh năm.'] },
+    bienbao: { lines: ['Biển báo "Trẻ em": gần đây có trường học, xe cộ phải đi chậm lại.', 'Biển hình tam giác viền đỏ là biển báo nguy hiểm.'] },
+    xebuyt: { lines: ['Trạm xe buýt đây. Chờ xe dừng hẳn rồi mới lên, xuống và nhớ xếp hàng nhé!', 'Trên xe buýt mình ngồi ngay ngắn, không thò đầu, thò tay ra ngoài.'] },
+    nha: { lines: ['Con chào bố mẹ, con đi học ạ!', 'Đi học về, mình nhớ chào ông bà, bố mẹ nhé.'] },
+    den: { lines: [function () { return st && st.sim && PHASES[st.sim.pi].open ? 'Đèn cho người đi bộ đang xanh: mình được sang đường, đi trên vạch kẻ.' : 'Đèn cho người đi bộ đang đỏ: mình đứng chờ trên vỉa hè.'; }, 'Đèn đỏ dừng lại, đèn vàng đi chậm, đèn xanh mới được đi.'] }
+  };
+  function poke(el) {
+    var k = POKES[el.getAttribute('data-id')];
+    if (!k) return;
+    k.i = ((k.i === undefined ? -1 : k.i) + 1) % k.lines.length;
+    var t = k.lines[k.i];
+    TT.audio.play(k.sfx || 'pop');
+    bubble(typeof t === 'function' ? t() : t);
   }
 
   function dateText() {
@@ -165,12 +283,12 @@
       target: null, keys: {}, joy: { x: 0, y: 0 }, drag: null, follow: true, seated: null,
       raf: 0, last: 0, stepT: 0, nearT: 0, near: null, nearId: '', moving: false, sig: '', el: {}
     };
-    var content = key === 'classroom' ? roomContent(p) : yardContent(p);
+    var content = key === 'classroom' ? roomContent(p) : (key === 'road' ? roadContent(p) : yardContent(p));
     st.npcs = content.npcs;
     container.innerHTML = '';
     container.style.background = sc.bg;
     var vp = h('div', { class: 'viewport', id: 'viewport', tabindex: '0', 'aria-label': sc.label });
-    var world = h('div', { class: 'world scene-' + key, style: 'width:' + sc.w + 'px;height:' + sc.h + 'px' });
+    var world = h('div', { class: 'world scene-' + key, 'data-light': 'go', style: 'width:' + sc.w + 'px;height:' + sc.h + 'px' });
     var divOn = p.settings.division;
 
     var hot = '';
@@ -332,7 +450,8 @@
   }
   /* m: khoảng hở muốn giữ quanh vật cản (dùng khi tìm đường, để không đi sát mép rồi vướng góc) */
   function blocked(x, y, m) {
-    var b = st.sc.blocks;
+    var b = st.sc.blocks, g = st.gate;
+    if (!m && g && x > g[0] && x < g[2] && y > g[1] && y < g[3]) return true; // cổng đang đóng (đèn đỏ ở vạch sang đường)
     m = m || 0;
     for (var i = 0; i < b.length; i++) { if (x > b[i][0] - m && x < b[i][2] + m && y > b[i][1] - m && y < b[i][3] + m) return true; }
     return false;
@@ -514,10 +633,11 @@
           // vướng vật cản: tìm lại đường một lần, vẫn vướng thì dừng (nơi đã chọn vẫn mở)
           var end = t.pts[t.pts.length - 1];
           if (!t.again) { t.again = true; t.stuck = 0; t.i = 0; t.pts = findPath(p.x, p.y, end.x, end.y); }
-          else reach();
+          else { if (Math.hypot(end.x - p.x, end.y - p.y) > 150) t.cb = null; reach(); } // còn xa đích (ví dụ bị đèn đỏ chặn) thì chỉ dừng lại
         }
       }
     }
+    if (st.sim) roadUpdate(dt);
     setMoving(moved);
     if (moved) {
       st.stepT -= dt;
@@ -631,14 +751,16 @@
     b.classList.remove('sing'); void b.getBoundingClientRect(); b.classList.add('sing');
   }
 
-  function greet(text) {
+  /* Bong bóng lời nói phía trên bạn nhỏ; wave = vừa nói vừa vẫy tay chào */
+  function bubble(text, wave) {
     if (!st) return;
     var b = st.el.bubble;
     b.textContent = text; b.hidden = false;
-    st.el.player.classList.add('waving');
+    st.el.player.classList.toggle('waving', !!wave);
     clearTimeout(st.greetT);
-    st.greetT = setTimeout(function () { if (st) { b.hidden = true; st.el.player.classList.remove('waving'); } }, 4200);
+    st.greetT = setTimeout(function () { if (st) { b.hidden = true; st.el.player.classList.remove('waving'); } }, 4600);
   }
+  function greet(text) { bubble(text, true); }
 
   /* ---------------- Chuột và chạm ----------------
    * Chuột: nhấn giữ trên mặt đất là bạn nhỏ đi theo con trỏ; nhả ra thì đi nốt tới điểm đó.
@@ -683,6 +805,7 @@
     if (d.kind === 'zone') return goZone(d.hit.getAttribute('data-id'));
     if (d.kind === 'npc') return talkTo(d.hit.getAttribute('data-id'));
     if (d.kind === 'bird') return sing(d.hit);
+    if (d.kind === 'poke') return poke(d.hit);
     var w = screenToWorld(cx, cy);
     walkTo(w.x, w.y);
   }
@@ -740,8 +863,8 @@
   function onKeyUp(e) { if (!st) return; var k = KEYMAP[e.key]; if (k) st.keys[k] = false; }
 
   TT.world = {
-    ZONES: ZONES, ROOM_ZONES: ROOM_ZONES, NPCS: NPCS, SCENES: SCENES,
-    build: build, destroy: destroy, goZone: goZone, walkTo: walkTo, greet: greet,
+    ZONES: ZONES, ROOM_ZONES: ROOM_ZONES, ROAD_ZONES: ROAD_ZONES, NPCS: NPCS, ROAD_NPCS: ROAD_NPCS, SCENES: SCENES, POKES: POKES,
+    build: build, destroy: destroy, goZone: goZone, walkTo: walkTo, greet: greet, say: bubble,
     relayout: function () { layout(true); },
     get state() { return st; }
   };
