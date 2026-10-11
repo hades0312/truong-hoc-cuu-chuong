@@ -64,6 +64,7 @@
       petAcc: { mit: 0, bong: 0, dau: 0 },
       classmates: [], seatmates: [], classDay: '',   // xem rollClassmates
       facts: {},
+      subj: {},                       // tiến độ các môn học lớp 4 (xem subjects.js)
       stars: 0,
       treats: 3,
       owned: ['flower'],              // đồ trang trí đã có

@@ -22,6 +22,7 @@
 
   /* ---------------- Khung màn hình ---------------- */
   function show(name) {
+    if (name === 'title' && app.updateReady) { app.updateReady = false; reloadForUpdate(); }
     app.screen = name;
     document.body.setAttribute('data-screen', name);
     ['title', 'setup', 'school', 'act', 'parent'].forEach(function (n) {
@@ -274,6 +275,7 @@
     hud.appendChild(h('span', { class: 'spacer' }));
     hud.appendChild(U.iconBtn('home', 'Về cổng trường', function () { TT.world.destroy(); show('title'); renderTitle(); }));
     if (app.scene === 'classroom') hud.appendChild(btn(h('span', { html: A.icon('door') + '<span class="hud-out">Ra sân</span>' }), 'pill', leaveRoom, { id: 'btn-leave-room', 'aria-label': 'Ra sân trường' }));
+    hud.appendChild(btn(h('span', { html: A.icon('walk') + '<span>Đi nhanh</span>' }), 'pill', quickMenu, { id: 'btn-quick', 'aria-label': 'Đi nhanh tới các khu' }));
     hud.appendChild(U.iconBtn(p.settings.sound ? 'sound' : 'mute', p.settings.sound ? 'Tắt âm thanh' : 'Bật âm thanh', function () {
       p.settings.sound = !p.settings.sound; S.save(); applyProfileSettings(); renderHud();
     }));
@@ -291,16 +293,22 @@
   }
 
   function renderQuickbar() {
-    var p = S.profile();
     var q = $('quickbar');
     q.innerHTML = '';
     q.appendChild(h('span', { class: 'qb-label', text: 'Đi nhanh' }));
     var row = h('div', { class: 'qb-row' });
-    function add(id, icon, name, fn) {
-      row.appendChild(btn(h('span', { class: 'qb', html: A.icon(icon) + '<span>' + name + '</span>' }), 'qb-btn', fn, { 'data-zone': id }));
-    }
+    quickEntries().forEach(function (e) {
+      row.appendChild(btn(h('span', { class: 'qb', html: A.icon(e.icon) + '<span>' + e.name + '</span>' }), 'qb-btn', e.fn, { 'data-zone': e.id }));
+    });
+    q.appendChild(row);
+  }
+
+  /* Các nơi đi nhanh của cảnh đang đứng */
+  function quickEntries() {
+    var p = S.profile(), list = [];
+    function add(id, icon, name, fn) { list.push({ id: id, icon: icon, name: name, fn: fn }); }
+    add('subjects', 'book', 'Môn học', subjectMenu);
     if (app.scene === 'classroom') {
-      add('cls-board', 'classroom', 'Bảng lớp: cùng học', function () { openZone('cls-board'); });
       add('cls-desk', 'desk', 'Luyện cùng cô Hằng', function () { openZone('cls-desk'); });
     } else {
       TT.world.ZONES.forEach(function (z) {
@@ -310,7 +318,7 @@
     }
     add('review', 'review', 'Ôn lại', function () { startMission('review'); });
     if (app.scene === 'classroom') add('cls-door', 'door', 'Ra sân', leaveRoom);
-    q.appendChild(row);
+    return list;
   }
 
   function talkNpc(n) {
@@ -322,10 +330,14 @@
     var avatar = n.kind === 'adult' ? A.adultSVG(n.art) : A.kidSVG(name, n.idx);
     var actions = [];
     if (n.id === 'hang') {
-      actions.push({ label: 'Học ở bảng lớp', fn: function () { openZone('cls-board'); } });
-      actions.push({ label: 'Luyện cùng cô', cls: 'secondary', fn: function () { startMission('classroom'); } });
+      actions.push({ label: 'Chọn môn học', fn: subjectMenu });
+      actions.push({ label: 'Luyện cửu chương', cls: 'secondary', fn: function () { startMission('classroom'); } });
     }
-    if (n.id === 'nam') actions.push({ label: 'Nhận nhiệm vụ hôm nay', fn: function () { openZone('board'); } });
+    if (n.id === 'lan') actions.push({ label: 'Học Tiếng Anh', fn: function () { startSubject('english'); } });
+    if (n.id === 'nam') {
+      actions.push({ label: 'Học Khoa học', fn: function () { startSubject('science'); } });
+      actions.push({ label: 'Nhiệm vụ hôm nay', cls: 'secondary', fn: function () { openZone('board'); } });
+    }
     if (n.id === 'hoa') actions.push({ label: 'Vào thư viện', fn: function () { openZone('library'); } });
     if (n.id === 'k1') actions.push({ label: 'Chuyền bóng', fn: function () { openZone('sports'); } });
     if (n.id === 'k0') actions.push({ label: 'Thu hoạch ở vườn', fn: function () { openZone('garden'); } });
@@ -363,10 +375,9 @@
     var p = S.profile();
     switch (id) {
       case 'classroom': return enterRoom();
-      case 'cls-board':
-        return openAct('Bảng lớp: cùng học', function (body) {
-          TT.act.learn(body, { onPractice: function (tables) { startMission('classroom', { tables: tables }); }, onChange: refreshCounters });
-        }, 'classroom', true);
+      case 'cls-board': return subjectMenu();
+      case 'cls-5dieu': return fiveTeachings();
+      case 'cls-photo': return wallPhoto();
       case 'cls-desk': return startMission('classroom');
       case 'cls-door': return leaveRoom();
       case 'library': return startMission('library');
@@ -387,6 +398,116 @@
         TT.act.island(body, { onMission: function (t) { startMission(t); }, onArt: function () { openZone('art'); } });
       }, 'island');
     }
+  }
+
+  /* ---------------- Các môn học lớp 4 (subjects.js) ---------------- */
+  function openLearn() {
+    openAct('Bảng lớp: cửu chương bằng hình', function (body) {
+      TT.act.learn(body, { onPractice: function (tables) { startMission('classroom', { tables: tables }); }, onChange: refreshCounters });
+    }, 'classroom', true);
+  }
+
+  /* Bảng "Hôm nay con học gì?" */
+  function subjectMenu() {
+    var box = h('div', { class: 'subj-menu' }, [h('h2', { text: 'Hôm nay con học gì?' })]);
+    var grid = h('div', { class: 'subj-grid' });
+    function card(id, em, name, note, fn) {
+      grid.appendChild(btn(h('span', {}, [h('span', { class: 'em', text: em }), h('b', { text: name }), h('small', { text: note })]), 'subj-card',
+        function () { U.closeModal(); fn(); }, { 'data-subj': id }));
+    }
+    card('learn', '✖️', 'Cửu chương', 'học bằng hình trên bảng', openLearn);
+    TT.subjects.available().forEach(function (s) {
+      card(s.id, s.icon, s.name, 'cùng ' + s.tname.charAt(0).toLowerCase() + s.tname.slice(1), function () { startSubject(s.id); });
+    });
+    box.appendChild(grid);
+    box.appendChild(h('div', { class: 'row-actions' }, [btn('Để sau', 'ghost', U.closeModal)]));
+    U.modal(box, { cls: 'wide' });
+  }
+
+  /* Chọn chủ đề của một môn (hoặc trộn tất cả) */
+  function pickTopic(sub, cb) {
+    var p = S.profile();
+    var box = h('div', { class: 'topic-menu' }, [h('h2', { text: sub.icon + ' ' + sub.name }), h('p', { text: 'Con chọn một chủ đề, hoặc trộn tất cả nhé.' })]);
+    var grid = h('div', { class: 'topic-grid' });
+    function add(tid, em, name, note, cls) {
+      grid.appendChild(btn(h('span', { class: 'topic-in' }, [h('span', { class: 'em', text: em }), h('span', { class: 'tn' }, [h('b', { text: name }), note ? h('small', { text: note }) : null])]),
+        'topic-btn ' + cls, function () { U.closeModal(); cb(tid); }, { 'data-topic': tid || 'all' }));
+    }
+    add(null, '🎲', 'Trộn tất cả chủ đề', '', 'all');
+    sub.topics.forEach(function (t) {
+      var st = TT.subjects.stats(p, sub.id, t.id), done = st.right + st.wrong;
+      add(t.id, t.icon, t.name, st.total && !t.make ? (st.seen ? 'đã gặp ' + st.seen + '/' + st.total + ' câu' : st.total + ' câu') : (done ? 'đã làm ' + done + ' câu' : 'đề mới mỗi lần'), '');
+    });
+    box.appendChild(grid);
+    box.appendChild(h('div', { class: 'row-actions' }, [btn('Để sau', 'ghost', U.closeModal)]));
+    U.modal(box, { cls: 'wide' });
+  }
+
+  /* topicId: undefined = hỏi bé chọn chủ đề; null = trộn tất cả */
+  function startSubject(sid, topicId) {
+    var sub = TT.subjects.get(sid);
+    if (!sub) return;
+    if (topicId === undefined) return pickTopic(sub, function (t) { startSubject(sid, t); });
+    var topic = sub.topics.filter(function (t) { return t.id === topicId; })[0];
+    var id = ++app.missionSeq;
+    openAct(sub.name + (topic ? ' · ' + topic.name : ''), function (body) {
+      app.currentRun = TT.subjects.run(body, { subject: sid, topic: topicId, onDone: function (res) {
+        finishMission(id, 'subj', res, { again: function () { startSubject(sid, topicId); } });
+      } });
+    }, 'classroom', true);
+  }
+
+  /* Xem to bức tranh treo phía trên bảng */
+  function wallPhoto() {
+    U.modal(h('div', { class: 'photo-box' }, [
+      h('img', { src: 'img/lop-hoc-tranh.jpg', alt: 'Bức tranh treo phía trên bảng lớp',
+        onerror: function (e) { var im = e.target; if (!/tranh-mac-dinh/.test(im.src)) im.src = 'img/tranh-mac-dinh.svg'; } }),
+      h('div', { class: 'row-actions' }, [btn('Đóng', 'primary', U.closeModal)])
+    ]), { cls: 'wide' });
+  }
+
+  /* ---------------- Chơi ngang màn hình ---------------- */
+  /* Thanh "Đi nhanh" dạng bảng chọn, dùng khi màn hình ngang thấp (điện thoại) không đủ chỗ cho thanh ở dưới */
+  function quickMenu() {
+    var box = h('div', { class: 'quick-menu' }, [h('h2', { text: 'Con muốn đi đâu?' })]);
+    var grid = h('div', { class: 'quick-grid' });
+    quickEntries().forEach(function (e) {
+      grid.appendChild(btn(h('span', { class: 'qb', html: A.icon(e.icon) + '<span>' + e.name + '</span>' }), 'qb-btn', function () { U.closeModal(); e.fn(); }, { 'data-zone': e.id }));
+    });
+    box.appendChild(grid);
+    box.appendChild(h('div', { class: 'row-actions' }, [btn('Đóng', 'ghost', U.closeModal)]));
+    U.modal(box, { cls: 'wide' });
+  }
+
+  /* Android: vào toàn màn hình rồi khoá hướng ngang. iPhone, iPad không cho trang web khoá hướng. */
+  function lockLandscape() {
+    var de = document.documentElement, req = de.requestFullscreen || de.webkitRequestFullscreen;
+    var lock = function () {
+      try { var r = root.screen.orientation.lock('landscape'); if (r && r.catch) r.catch(function () { /* máy không cho khoá */ }); } catch (e) { /* */ }
+    };
+    try {
+      if (!req || document.fullscreenElement) return lock();
+      var p = req.call(de);
+      if (p && p.then) p.then(lock, function () { /* */ }); else lock();
+    } catch (e) { /* */ }
+  }
+  /* Bảng nhắc "xoay ngang màn hình" (hiện bằng CSS khi máy cảm ứng đang cầm dọc) */
+  function initRotateWall() {
+    var canLock = !!(root.screen && root.screen.orientation && root.screen.orientation.lock) && /Android/i.test(navigator.userAgent);
+    var lockBtn = $('rotate-lock'), skip = $('rotate-skip');
+    if (lockBtn) { lockBtn.hidden = !canLock; lockBtn.addEventListener('click', lockLandscape); }
+    if (skip) skip.addEventListener('click', function () { document.body.classList.add('portrait-ok'); });
+  }
+
+  /* Bảng 5 điều Bác Hồ dạy treo trong lớp */
+  function fiveTeachings() {
+    var lines = ['Yêu Tổ quốc, yêu đồng bào', 'Học tập tốt, lao động tốt', 'Đoàn kết tốt, kỷ luật tốt', 'Giữ gìn vệ sinh thật tốt', 'Khiêm tốn, thật thà, dũng cảm'];
+    var ol = h('ol');
+    lines.forEach(function (t) { ol.appendChild(h('li', { text: t })); });
+    var row = h('div', { class: 'row-actions' });
+    if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak('Năm điều Bác Hồ dạy. ' + lines.map(function (t, i) { return 'Điều ' + (i + 1) + '. ' + t; }).join('. ') + '.'); }));
+    row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
+    U.modal(h('div', { class: 'five' }, [h('h2', { text: '5 điều Bác Hồ dạy' }), ol, row]), { cls: 'wide' });
   }
 
   var MISSION_TITLES = {
@@ -509,7 +630,7 @@
     } else {
       acts.appendChild(btn('Trang trí đảo', 'secondary', function () { openZone('art'); }, { id: 'btn-decorate' }));
       acts.appendChild(btn('Nghỉ một chút', 'ghost', function () { app.sessionMs = 0; TT.world.destroy(); show('title'); renderTitle(); }));
-      if (theme !== 'warmup') acts.appendChild(btn('Chơi tiếp', 'primary', function () { startMission(theme, opts.quest ? { tables: opts.tables } : { tables: opts.tables }); }, { id: 'btn-again' }));
+      if (theme !== 'warmup') acts.appendChild(btn('Chơi tiếp', 'primary', function () { if (opts.again) opts.again(); else startMission(theme, { tables: opts.tables }); }, { id: 'btn-again' }));
       acts.appendChild(btn(backLabel(), theme === 'warmup' ? 'primary' : 'ghost', closeAct, { id: 'btn-to-school' }));
     }
     box.appendChild(acts);
@@ -554,6 +675,8 @@
       if (!enabled || !req) return fallback();
       var r = req.call(de);
       if (r && r.catch) r.catch(fallback);
+      // trên máy cảm ứng, vào toàn màn hình thì giữ luôn hướng ngang (máy nào không cho thì thôi)
+      if (document.body.classList.contains('touch') && r && r.then) r.then(lockLandscape, function () { /* */ });
     } catch (e) { fallback(); }
   }
 
@@ -565,6 +688,32 @@
 
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
+  /* ---------------- Tự cập nhật ----------------
+   * Game được lưu sẵn trong máy để chơi offline (sw.js), nên phải chủ động hỏi máy chủ xem có bản mới:
+   * mỗi lần quay lại trang và mỗi 30 phút. Có bản mới thì tải lại ở cổng trường; đang chơi dở thì chờ bé về cổng. */
+  function watchUpdates() {
+    var sw = navigator.serviceWorker, had = !!sw.controller;
+    sw.register('sw.js').then(function (reg) {
+      var check = function () {
+        if (document.visibilityState !== 'visible') return;
+        try { var r = reg.update(); if (r && r.catch) r.catch(function () { /* đang mất mạng */ }); } catch (e) { /* */ }
+      };
+      document.addEventListener('visibilitychange', check);
+      setInterval(check, 30 * 60000);
+    }).catch(function () { /* không có offline cũng không sao */ });
+    sw.addEventListener('controllerchange', function () {
+      if (!had) { had = true; return; } // lần cài đầu tiên: không có gì để cập nhật
+      if (app.screen === 'title') return reloadForUpdate();
+      app.updateReady = true;
+      U.toast('Game vừa có bản mới. Khi con về cổng trường, game sẽ tự cập nhật.', 5200);
+    });
+  }
+  function reloadForUpdate() {
+    var last = 0;
+    try { last = +root.sessionStorage.getItem('tt-reloaded') || 0; root.sessionStorage.setItem('tt-reloaded', String(Date.now())); } catch (e) { /* */ }
+    if (Date.now() - last > 20000) root.location.reload(); // không tải lại liên tục nếu có trục trặc
+  }
+
   /* Màn hình cảm ứng thì hiện nút điều hướng; máy tính dùng bàn phím và chuột */
   function detectTouch() {
     var coarse = root.matchMedia && root.matchMedia('(any-pointer: coarse)').matches;
@@ -575,6 +724,7 @@
   function boot() {
     setVh();
     detectTouch();
+    initRotateWall();
     root.addEventListener('resize', setVh);
     root.addEventListener('orientationchange', function () { setTimeout(setVh, 200); });
     if (root.visualViewport) root.visualViewport.addEventListener('resize', setVh);
@@ -586,9 +736,7 @@
     document.addEventListener('tt-voices', function () { /* nút đọc xuất hiện ở câu hỏi tiếp theo */ });
     show('title');
     renderTitle();
-    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-      navigator.serviceWorker.register('sw.js').catch(function () { /* không có offline cũng không sao */ });
-    }
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) watchUpdates();
   }
 
   // Chủ đề "Luyện cùng cô Hằng" trong lớp học
@@ -601,6 +749,7 @@
     }
   };
 
+  app.subjectMenu = subjectMenu; app.startSubject = startSubject;
   app.openZone = openZone; app.startMission = startMission; app.enterAs = enterAs; app.toggleFullscreen = toggleFullscreen;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(window);

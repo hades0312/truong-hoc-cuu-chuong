@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Trường học cửu chương</title>
-  <meta name="description" content="Trò chơi học bảng cửu chương bằng hình ảnh cho học sinh tiểu học. Chạy offline, không quảng cáo, không thu thập dữ liệu.">
+  <meta name="description" content="Trò chơi học bảng cửu chương bằng hình ảnh và các môn Toán, Khoa học, Tiếng Anh lớp 4 cho học sinh tiểu học. Chạy offline, không quảng cáo, không thu thập dữ liệu.">
   <!-- Ảnh và lời giới thiệu hiện ra khi chia sẻ link lên Facebook, Zalo, Messenger… (đổi tên miền nếu bạn tự đăng ở nơi khác) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://congai.lamphong.info/">
-  <meta property="og:title" content="Trường học cửu chương — bé vừa chơi vừa thuộc bảng cửu chương">
-  <meta property="og:description" content="Tạo nhân vật mang tên mình, đeo ba lô đi học, vào lớp, lên bảng và luyện bảng nhân 2–9 qua trò chơi. Miễn phí, không quảng cáo, chơi được trên điện thoại, máy tính bảng, máy tính.">
+  <meta property="og:title" content="Trường học cửu chương — bé vừa chơi vừa học Toán, Khoa học, Tiếng Anh lớp 4">
+  <meta property="og:description" content="Tạo nhân vật mang tên mình, đeo ba lô đi học, vào lớp, lên bảng: luyện bảng cửu chương và học Toán, Khoa học, Tiếng Anh lớp 4 qua trò chơi. Miễn phí, không quảng cáo, chơi được trên điện thoại, máy tính bảng, máy tính.">
   <meta property="og:image" content="https://congai.lamphong.info/icons/og-cover.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -30,7 +30,8 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <!-- ?v=…: tăng số này (ở mọi chỗ trong file) cùng với CACHE trong sw.js mỗi lần đưa bản mới lên -->
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body data-screen="title">
   <div id="app">
@@ -45,21 +46,36 @@
     <section id="s-parent" class="screen act parent-screen" hidden aria-label="Góc dành cho ba mẹ"></section>
   </div>
   <div id="modal-root"></div>
+  <!-- Nhắc xoay ngang: hiện khi điện thoại, máy tính bảng đang cầm dọc (xem css và initRotateWall trong app.js) -->
+  <div id="rotate-wall" class="rotate-wall" role="dialog" aria-label="Xoay ngang màn hình để chơi">
+    <div class="rotate-card">
+      <svg class="rotate-ico" viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="14" width="40" height="66" rx="8" fill="none" stroke="#b8a1ff" stroke-width="5" stroke-dasharray="7 6"/><rect x="50" y="44" width="64" height="38" rx="8" fill="#7b61ff"/><rect x="57" y="50" width="50" height="26" rx="3" fill="#fff"/><path d="M40 8 Q78 2 88 30" fill="none" stroke="#ff8fab" stroke-width="5" stroke-linecap="round"/><path d="M78 26 L89 33 L95 21" fill="none" stroke="#ff8fab" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2>Xoay ngang màn hình để chơi nhé!</h2>
+      <p>Cầm ngang điện thoại hoặc máy tính bảng thì sân trường rộng hơn và dễ chơi hơn.</p>
+      <button type="button" id="rotate-lock" class="btn primary big" hidden>Xoay ngang giúp con</button>
+      <p class="muted small">Màn hình không tự xoay? Hãy tắt “Khoá xoay màn hình” trong bảng điều khiển nhanh của máy.</p>
+      <button type="button" id="rotate-skip" class="btn ghost small">Cứ chơi dọc</button>
+    </div>
+  </div>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript><p style="padding:24px;font-size:20px">Game cần bật JavaScript để chạy.</p></noscript>
 
-  <script src="js/engine.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/art.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/external.js"></script>
-  <script src="js/install.js"></script>
-  <script src="js/visual.js"></script>
-  <script src="js/quiz.js"></script>
-  <script src="js/activities.js"></script>
-  <script src="js/world.js"></script>
-  <script src="js/parent.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/engine.js?v=10"></script>
+  <script src="js/storage.js?v=10"></script>
+  <script src="js/audio.js?v=10"></script>
+  <script src="js/art.js?v=10"></script>
+  <script src="js/ui.js?v=10"></script>
+  <script src="js/external.js?v=10"></script>
+  <script src="js/install.js?v=10"></script>
+  <script src="js/visual.js?v=10"></script>
+  <script src="js/quiz.js?v=10"></script>
+  <script src="js/bank-math.js?v=10"></script>
+  <script src="js/bank-science.js?v=10"></script>
+  <script src="js/bank-english.js?v=10"></script>
+  <script src="js/subjects.js?v=10"></script>
+  <script src="js/activities.js?v=10"></script>
+  <script src="js/world.js?v=10"></script>
+  <script src="js/parent.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
 </body>
 </html>

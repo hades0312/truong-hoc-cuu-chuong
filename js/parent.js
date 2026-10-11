@@ -114,6 +114,26 @@
     wrap.appendChild(map);
 
     // ---- Thiết lập ----
+    // ---- Các môn học lớp 4 ----
+    var subs = TT.subjects.available();
+    if (subs.length) {
+      var sc = h('section', { class: 'p-card' }, [h('h2', { text: 'Các môn học lớp 4' })]);
+      var grid = h('div', { class: 'table-progress' });
+      subs.forEach(function (s0) {
+        var st = TT.subjects.stats(p, s0.id), done = st.right + st.wrong;
+        var note = !done ? 'chưa học'
+          : 'đúng ngay ' + st.right + ' câu, cần gợi ý ' + st.wrong + ' câu' + (st.total > 20 ? ' · đã gặp ' + st.seen + '/' + st.total + ' câu trong ngân hàng' + (st.review ? ', nên ôn ' + st.review + ' câu' : '') : '');
+        grid.appendChild(h('div', { class: 'tp subj-row' }, [
+          h('span', { class: 'tp-name', text: s0.icon + ' ' + s0.name }),
+          h('span', { class: 'tp-bar' }, [h('span', { class: 'tp-solid', style: 'width:' + (done ? Math.round(st.right * 100 / done) : 0) + '%' })]),
+          h('span', { class: 'tp-n', text: note })
+        ]));
+      });
+      sc.appendChild(grid);
+      sc.appendChild(h('p', { class: 'muted', text: 'Thanh xanh: tỉ lệ câu con tự làm đúng ngay lần đầu, không cần gợi ý. Câu phải nhờ gợi ý sẽ được hỏi lại ở các lượt sau.' }));
+      wrap.appendChild(sc);
+    }
+
     var set = h('section', { class: 'p-card' }, [h('h2', { text: 'Thiết lập cho ' + pname })]);
     var tRow = h('div', { class: 'chip-row', role: 'group', 'aria-label': 'Bảng nhân luyện tập' }, [h('span', { class: 'row-label', text: 'Bảng nhân luyện tập' })]);
     for (var t = 2; t <= 9; t++) {

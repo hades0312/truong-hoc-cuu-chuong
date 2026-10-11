@@ -1,7 +1,7 @@
 # Trường học cửu chương
 
-Game nhỏ cho các bạn tiểu học vừa chơi vừa luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia).
-Bé tự tạo nhân vật mang tên mình, đeo ba lô đi qua cổng trường, vào lớp, lên bảng, rồi luyện phép nhân qua các trò chơi.
+Game nhỏ cho các bạn tiểu học vừa chơi vừa học: luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia) và học Toán, Khoa học, Tiếng Anh lớp 4.
+Bé tự tạo nhân vật mang tên mình, đeo ba lô đi qua cổng trường, vào lớp, lên bảng, rồi học và luyện qua các trò chơi.
 
 **Chơi ngay: <https://congai.lamphong.info>**
 
@@ -23,13 +23,34 @@ Game chỉ là các file tĩnh (HTML, CSS, JavaScript), không có máy chủ ph
 
 Ngoài ra còn có thư viện ghép thẻ, nhà ăn chia phần (phép chia), bảng tin với nhiệm vụ mỗi ngày, và phần "Ôn lại" tự chọn những phép tính bé hay sai.
 
+### Các môn học lớp 4
+
+Bấm **Bảng lớp** trong lớp học hoặc nút **Môn học** ở thanh Đi nhanh để chọn môn. Nội dung soạn theo Chương trình giáo dục phổ thông 2018.
+
+![Chọn môn học](screenshots/17-chon-mon-hoc.png)
+
+| Môn | Nội dung |
+| --- | --- |
+| **Toán lớp 4** (cô Hằng) | 8 chủ đề: số có nhiều chữ số, cộng trừ số lớn, nhân chia, trung bình cộng và tổng–hiệu, phân số, đo lường, hình học, biểu thức và tìm số chưa biết. Đề sinh ngẫu nhiên nên làm mãi không trùng. |
+| **Khoa học** (thầy Nam) | 146 câu, 8 chủ đề: nước, không khí, ánh sáng và âm thanh, nhiệt, thực vật và động vật, nấm, dinh dưỡng và sức khoẻ, chuỗi thức ăn. |
+| **Tiếng Anh** (cô Lan) | 218 câu, 12 chủ đề theo sách Global Success 4, có máy đọc tiếng Anh và câu nghe (cần thiết bị có giọng đọc tiếng Anh). |
+
+Mỗi lượt 6 câu trắc nghiệm. Sai lần đầu có gợi ý, sai lần hai được chỉ đáp án kèm giải thích, và câu đó sẽ được hỏi lại. Câu mới và câu từng sai được ưu tiên ở các lượt sau.
+
+| | |
+| --- | --- |
+| ![Khoa học](screenshots/19-khoa-hoc.png) **Khoa học:** trả lời sai thì có gợi ý để nghĩ tiếp. | ![Tiếng Anh](screenshots/20-tieng-anh.png) **Tiếng Anh:** trả lời xong máy đọc từ, câu tiếng Anh cho bé nghe. |
+| ![Toán lớp 4](screenshots/21-toan-lop-4.png) **Toán lớp 4:** mỗi câu có lời giải thích cách làm. | ![5 điều Bác Hồ dạy](screenshots/18-nam-dieu-bac-ho-day.png) **5 điều Bác Hồ dạy:** chạm vào bảng trên tường lớp để đọc chữ to và nghe đọc. |
+
+Phía trên bảng lớp có một bức tranh trong khung. Bản trong repo này treo lá cờ (`img/tranh-mac-dinh.svg`); muốn treo ảnh của nhà mình thì đặt một file tên `img/lop-hoc-tranh.jpg` (ảnh ngang, tỉ lệ khoảng 2:1) vào thư mục `img/`, game sẽ tự dùng ảnh đó. Chạm vào tranh để xem to.
+
 ## Cài game ra màn hình chính
 
 Cài một lần, sau đó bé chỉ cần chạm vào biểu tượng **Cửu chương** là vào chơi: toàn màn hình, không có thanh địa chỉ, và chơi được cả khi không có mạng.
 
 Cách nhanh nhất: mở game rồi bấm nút vàng **Cài app** ở góc trên màn hình cổng trường. Nút tự nhận biết loại máy; máy nào không cài tự động được thì nút hiện hướng dẫn từng bước cho đúng máy đó.
 
-<img src="screenshots/16-cai-app.png" alt="Hướng dẫn cài trên iPhone" width="270"> <img src="screenshots/15-choi-tren-dien-thoai.png" alt="Chơi trên điện thoại" width="270">
+![Hướng dẫn cài trên iPhone](screenshots/16-cai-app.png)
 
 Nếu muốn tự làm bằng tay:
 
@@ -50,6 +71,9 @@ Lưu ý:
 ## Cách điều khiển
 
 - **Máy tính:** phím mũi tên hoặc `W A S D` để đi; hoặc nhấn giữ chuột, nhân vật đi theo con trỏ (nhấp một lần là đi tới điểm đó). Đứng gần một nơi hay một người rồi nhấn `Enter` để vào.
+![Chơi trên điện thoại cầm ngang](screenshots/15-choi-tren-dien-thoai.png)
+
+- **Chơi ngang màn hình:** game thiết kế cho màn hình ngang. Điện thoại, máy tính bảng đang cầm dọc sẽ được nhắc xoay ngang (vẫn có nút "Cứ chơi dọc" cho máy bị khoá xoay); bản đã cài trên Android tự mở ngang. Trên điện thoại cầm ngang, thanh "Đi nhanh" gom vào một nút ở thanh trên để nhường chỗ cho bản đồ.
 - **Điện thoại, máy tính bảng:** vòng tròn điều hướng ở góc trái dưới (giữ và nghiêng về hướng muốn đi), nút vàng ở góc phải dưới để vào nơi đang đứng gần. Cũng có thể chạm vào nơi muốn tới, hoặc kéo để xem bản đồ.
 - Thanh **Đi nhanh** ở dưới cùng đưa bé tới thẳng từng khu.
 
@@ -81,6 +105,7 @@ Tên trong bản này là tên các bạn cùng lớp của con mình. Để đ�
 | Bạn nào là nam (để vẽ đúng hình) | Danh sách `BOYS` trong `js/art.js`; ai không có trong đó sẽ vẽ hình bạn nữ |
 | Hai nhân vật có sẵn | `CHARACTERS` trong `js/storage.js` |
 | Tên cô giáo | Tìm và thay chữ `Hằng` trong các file ở `js/` |
+| Câu hỏi Khoa học, Tiếng Anh | Thêm, sửa các câu trong `js/bank-science.js`, `js/bank-english.js` (mỗi câu gồm câu hỏi `q`, đáp án đúng `a`, các đáp án sai `wrong`, lời giải thích `why`) |
 | Thầy cô, chú bảo vệ ngoài sân | Danh sách `NPCS` trong `js/world.js` |
 | Tên trường trên cổng | Tìm `Tân Trường` trong `js/art.js`, `js/world.js`, `manifest.webmanifest` |
 | Biển tên các lớp | Tìm `Lớp 4A` trong `js/art.js` |
@@ -92,11 +117,12 @@ Mỗi ngày game chọn ngẫu nhiên 4 bạn đứng ngoài sân và 10 bạn n
 Game chỉ gồm file tĩnh nên đặt ở đâu cũng được, miễn là có **https** (cần cho cài app và chơi offline).
 
 - **GitHub Pages (miễn phí):** bấm **Fork** repo này → vào **Settings → Pages** → mục *Branch* chọn `main`, thư mục `/ (root)` → **Save**. Vài phút sau game chạy ở `https://<tên-tài-khoản>.github.io/<tên-repo>/`.
-- **Hosting hoặc máy chủ riêng:** chép `index.html`, `manifest.webmanifest`, `sw.js` và ba thư mục `css/`, `js/`, `icons/` vào thư mục web.
+- **Hosting hoặc máy chủ riêng:** chép `index.html`, `manifest.webmanifest`, `sw.js` và bốn thư mục `css/`, `js/`, `icons/`, `img/` vào thư mục web.
 
 Hai việc cần nhớ khi tự đăng:
 
-- **Mỗi lần sửa file, tăng số trong `CACHE` ở đầu `sw.js`** (ví dụ `tientien-v7` → `tientien-v8`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
+- **Mỗi lần sửa file, tăng số phiên bản ở hai chỗ:** `CACHE` ở đầu `sw.js` (ví dụ `tientien-v10` → `tientien-v11`) và số `?v=` trong `index.html` (tìm `?v=10`, thay tất cả thành `?v=11`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
+- **Game tự cập nhật:** vì game được lưu sẵn trong máy để chơi offline, mỗi lần mở lại (và mỗi 30 phút khi đang mở) trang sẽ hỏi máy chủ xem có bản mới. Có bản mới thì game tự tải lại ở màn hình cổng trường; nếu bé đang chơi dở, game chờ tới khi bé về cổng trường rồi mới cập nhật, tiến độ không mất.
 - Đổi tên miền trong các thẻ `og:url` và `og:image` ở đầu `index.html` thành địa chỉ của bạn, để link chia sẻ lên mạng xã hội hiện đúng ảnh.
 
 ## Cấu trúc mã nguồn
@@ -110,13 +136,16 @@ Không dùng thư viện ngoài, không cần bước build. Hình vẽ là SVG 
 - `js/audio.js` — hiệu ứng, tiếng chim và âm thanh nền theo cảnh, giọng đọc tiếng Việt
 - `js/world.js` — các cảnh đi lại được: bàn phím, chuột, nút điều hướng, vật cản, tìm đường
 - `js/quiz.js` — bộ chạy nhiệm vụ, gợi ý hai mức, hỏi lại câu sai
+- `js/subjects.js` — các môn học lớp 4: chọn câu, chạy lượt trắc nghiệm, ghi tiến độ
+- `js/bank-math.js`, `js/bank-science.js`, `js/bank-english.js` — ngân hàng câu hỏi Toán (sinh đề ngẫu nhiên), Khoa học, Tiếng Anh
 - `js/activities.js` — bảng lớp, thư viện, bảng tin, mỹ thuật, thú cưng, đảo
 - `js/visual.js` — hình nhóm đồ vật và bảng chấm
 - `js/install.js` — nút "Cài app" cho từng loại thiết bị
 - `js/external.js` — chuyển sang trình duyệt thật khi link được mở trong Facebook, Zalo…
 - `js/parent.js` — góc ba mẹ
 - `js/app.js` — điều phối màn hình và luồng chơi
-- `manifest.webmanifest`, `sw.js`, `icons/` — cài app và chơi offline
+- `manifest.webmanifest`, `sw.js`, `icons/` — cài app, chơi offline và tự cập nhật
+- `img/` — tranh treo trong lớp
 
 ## Quy ước phép nhân
 

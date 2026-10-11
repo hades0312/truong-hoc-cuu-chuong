@@ -223,6 +223,7 @@
       hang: { top: '#a8dadc', bottom: '#a8dadc', hair: 'long', extra: 'glasses', dress: true },
       nam: { top: '#b7e4c7', bottom: '#4a5a7a', hair: 'short', extra: 'tie' },
       hoa: { top: '#cdb4db', bottom: '#6d597a', hair: 'bun', extra: 'book', dress: true },
+      lan: { top: '#ffc8dd', bottom: '#ffc8dd', hair: 'long', extra: 'abc', dress: true },
       binh: { top: '#d4a373', bottom: '#5e503f', hair: 'cap', extra: 'whistle' }
     }[kind];
     s += '<rect x="46" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/><rect x="62" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/>';
@@ -233,6 +234,7 @@
     s += '<circle cx="32" cy="146" r="7" fill="' + SKIN + '"/><circle cx="88" cy="146" r="7" fill="' + SKIN + '"/>';
     if (conf.extra === 'tie') s += '<path d="M56 98 L64 98 L62 104 L66 128 L60 134 L54 128 L58 104 Z" fill="#e76f51"/>';
     if (conf.extra === 'book') s += '<rect x="76" y="120" width="26" height="32" rx="3" fill="#e63946"/><rect x="80" y="124" width="18" height="4" fill="#fff" opacity=".7"/>';
+    if (conf.extra === 'abc') s += '<rect x="73" y="118" width="32" height="25" rx="4" fill="#fff" stroke="#118ab2" stroke-width="2.5"/><text x="89" y="136" text-anchor="middle" class="w-label" font-size="12" fill="#118ab2">ABC</text>';
     if (conf.extra === 'whistle') s += '<path d="M50 98 Q60 120 70 98" stroke="#e63946" stroke-width="2" fill="none"/><rect x="56" y="116" width="10" height="6" rx="3" fill="#bbb"/>';
     s += '<rect x="54" y="84" width="12" height="14" fill="' + SKIN_SH + '"/>';
     if (conf.hair === 'long') s += '<path d="M28 56 Q22 108 40 112 L80 112 Q98 108 92 56 Z" fill="' + HAIR + '"/>';
@@ -339,6 +341,7 @@
     pets: '<circle cx="16" cy="19" r="7" fill="#f4a261"/><circle cx="8" cy="12" r="3.2" fill="#f4a261"/><circle cx="13" cy="7" r="3.2" fill="#f4a261"/><circle cx="19" cy="7" r="3.2" fill="#f4a261"/><circle cx="24" cy="12" r="3.2" fill="#f4a261"/>',
     board: '<rect x="4" y="4" width="24" height="18" rx="2" fill="#c68b59"/><rect x="7" y="7" width="8" height="6" fill="#fff"/><rect x="17" y="8" width="8" height="8" fill="#ffd6a5"/><rect x="8" y="15" width="7" height="5" fill="#caffbf"/><rect x="9" y="22" width="3" height="7" fill="#8d6e63"/><rect x="20" y="22" width="3" height="7" fill="#8d6e63"/>',
     review: '<path d="M16 5 A11 11 0 1 1 6 12" fill="none" stroke="#7b61ff" stroke-width="3.2" stroke-linecap="round"/><path d="M3 6 L6 13 L12 9" fill="none" stroke="#7b61ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 11 V17 L20 19" stroke="#7b61ff" stroke-width="2.6" stroke-linecap="round" fill="none"/>',
+    book: '<path d="M3.5 8 Q10 4.5 16 8 Q22 4.5 28.5 8 V25.5 Q22 22 16 25.5 Q10 22 3.5 25.5 Z" fill="#fff" stroke="#7b61ff" stroke-width="2.6" stroke-linejoin="round"/><path d="M16 8 V25.5" stroke="#7b61ff" stroke-width="2.6"/><path d="M7.5 12.5 Q10 11.5 12.5 12.5 M7.5 16.5 Q10 15.5 12.5 16.5 M19.5 12.5 Q22 11.5 24.5 12.5 M19.5 16.5 Q22 15.5 24.5 16.5" stroke="#ff8fab" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
     desk: '<rect x="3" y="12" width="26" height="6" rx="2" fill="#d6a877"/><rect x="5" y="18" width="3.5" height="10" fill="#a9774b"/><rect x="23.5" y="18" width="3.5" height="10" fill="#a9774b"/><rect x="10" y="5" width="12" height="7" rx="1.2" fill="#fff" stroke="#9fb7d1" stroke-width="1.2"/><path d="M12.5 8.5 H19.5" stroke="#9fb7d1" stroke-width="1.2"/>',
     door: '<rect x="8" y="3" width="17" height="26" rx="2" fill="#c68b59"/><rect x="11" y="6" width="11" height="9" rx="1" fill="#bde0fe"/><circle cx="21.5" cy="19" r="1.7" fill="#ffd166"/><path d="M5 29 H28" stroke="#8d6e63" stroke-width="2" stroke-linecap="round"/>',
     install: '<rect x="8" y="2.5" width="16" height="27" rx="4" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M16 9 V19 M11.5 15 L16 19.5 L20.5 15" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 25 H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
@@ -454,6 +457,16 @@
     ];
   }
 
+  /* Mặt bên và mái bên của một ngôi nhà, vẽ trước mặt chính: nhà trông có khối như nhìn chếch từ bên trái.
+   * (x, y, w, hgt): mặt chính · (ax, ay): đỉnh mái · (ex, ey): mép mái bên phải */
+  var SIDE_DX = 46, SIDE_DY = -32;
+  function houseSide(x, y, w, hgt, ax, ay, ex, ey, wall, roof) {
+    var r = x + w;
+    return '<path d="M' + r + ' ' + y + ' l' + SIDE_DX + ' ' + SIDE_DY + ' v' + hgt + ' l' + (-SIDE_DX) + ' ' + (-SIDE_DY) + 'Z" fill="' + wall + '"/>' +
+      '<path d="M' + r + ' ' + (y + hgt) + ' l' + SIDE_DX + ' ' + SIDE_DY + ' l34 6 l' + (-SIDE_DX) + ' ' + (-SIDE_DY + 4) + 'Z" fill="#000" opacity=".07"/>' +
+      '<path d="M' + ax + ' ' + ay + ' L' + ex + ' ' + ey + ' l' + SIDE_DX + ' ' + SIDE_DY + ' L' + (ax + SIDE_DX) + ' ' + (ay + SIDE_DY) + 'Z" fill="' + roof + '"/>';
+  }
+
   /* o.noProps: bỏ các vật cao (world.js tự xếp chúng theo chiều sâu cùng nhân vật) */
   function schoolScene(o) {
     var s = '';
@@ -482,14 +495,14 @@
     s += '<path d="M470 900 L260 1000 M2030 900 L2200 980 M600 1090 L420 1180 M1900 1090 L1950 1150" stroke="#f3e2c0" stroke-width="70" stroke-linecap="round"/>';
 
     // Phòng Mỹ thuật (trái)
-    s += '<g id="b-art"><rect x="230" y="420" width="380" height="230" rx="10" fill="#ffd6e0"/>' +
+    s += '<g id="b-art">' + houseSide(230, 420, 380, 230, 420, 330, 630, 430, '#eeb4c4', '#e36d8f') + '<rect x="230" y="420" width="380" height="230" rx="10" fill="#ffd6e0"/>' +
       '<path d="M210 430 L420 330 L630 430 Z" fill="#ff8fab"/><rect x="210" y="424" width="420" height="16" rx="6" fill="#f2668b"/>' +
       windowRow(260, 470, 2, 110, 80, 70, '#ffe5ec') + '<rect x="490" y="520" width="80" height="130" rx="10" fill="#c9184a" opacity=".85"/><circle cx="555" cy="590" r="5" fill="#ffd166"/>' +
       '<g transform="translate(300 560)"><circle r="28" fill="#fff3c4"/><circle cx="-10" cy="-8" r="6" fill="#ef476f"/><circle cx="8" cy="-10" r="6" fill="#118ab2"/><circle cx="12" cy="8" r="6" fill="#06d6a0"/></g>' +
       signBoard(420, 395, 230, 'Phòng Mỹ thuật', '#fff') + '</g>';
 
     // Khối lớp học hai tầng (giữa)
-    s += '<g id="b-class">' +
+    s += '<g id="b-class">' + houseSide(700, 270, 880, 390, 1140, 150, 1600, 280, '#ead79c', '#c8632d') +
       '<rect x="700" y="270" width="880" height="390" rx="8" fill="#fff3c4"/>' +
       '<path d="M680 280 L1140 150 L1600 280 Z" fill="url(#roofA)"/><rect x="680" y="272" width="920" height="18" rx="6" fill="#d9692f"/>' +
       '<circle cx="1140" cy="225" r="34" fill="#fff" stroke="#3b2f63" stroke-width="5"/><path d="M1140 225 V202 M1140 225 L1156 233" stroke="#3b2f63" stroke-width="5" stroke-linecap="round"/>' +
@@ -510,7 +523,7 @@
       '</g>';
 
     // Thư viện (phải)
-    s += '<g id="b-lib"><rect x="1700" y="400" width="360" height="250" rx="10" fill="#d7ecff"/>' +
+    s += '<g id="b-lib">' + houseSide(1700, 400, 360, 250, 1880, 310, 2080, 410, '#b5d2ee', '#3f7fd0') + '<rect x="1700" y="400" width="360" height="250" rx="10" fill="#d7ecff"/>' +
       '<path d="M1680 410 L1880 310 L2080 410 Z" fill="#5c9ded"/><rect x="1680" y="404" width="400" height="16" rx="6" fill="#3d7fd6"/>' +
       windowRow(1730, 450, 1, 0, 90, 80, '#eef7ff') + windowRow(1950, 450, 1, 0, 80, 80, '#eef7ff') +
       '<rect x="1840" y="510" width="80" height="140" rx="10" fill="#1d4e89"/><circle cx="1905" cy="585" r="5" fill="#ffd166"/>' +
@@ -518,7 +531,7 @@
       signBoard(1880, 378, 160, 'Thư viện', '#fff') + '</g>';
 
     // Nhà vệ sinh + vòi rửa tay + thùng rác (chi tiết môi trường)
-    s += '<g id="b-wc"><rect x="2120" y="470" width="190" height="170" rx="10" fill="#e9f5f2"/><path d="M2110 476 L2215 420 L2320 476Z" fill="#94d2bd"/>' +
+    s += '<g id="b-wc">' + houseSide(2120, 470, 190, 170, 2215, 420, 2320, 476, '#cbe2dc', '#76bfa6') + '<rect x="2120" y="470" width="190" height="170" rx="10" fill="#e9f5f2"/><path d="M2110 476 L2215 420 L2320 476Z" fill="#94d2bd"/>' +
       '<rect x="2140" y="530" width="56" height="110" rx="8" fill="#0a9396"/><rect x="2230" y="530" width="56" height="110" rx="8" fill="#ee6c4d"/>' +
       '<circle cx="2168" cy="510" r="11" fill="#0a9396"/><circle cx="2258" cy="510" r="11" fill="#ee6c4d"/>' +
       label(2215, 462, 'Nhà vệ sinh', 20) +
@@ -534,7 +547,7 @@
       signBoard(2225, 728, 210, 'Vườn toán học', '#fff') + '</g>';
 
     // Nhà ăn (trái giữa)
-    s += '<g id="b-canteen"><rect x="40" y="720" width="380" height="230" rx="10" fill="#ffe0b5"/>' +
+    s += '<g id="b-canteen">' + houseSide(40, 720, 380, 230, 230, 640, 440, 730, '#efc792', '#b94c36') + '<rect x="40" y="720" width="380" height="230" rx="10" fill="#ffe0b5"/>' +
       '<path d="M20 730 L230 640 L440 730Z" fill="#e76f51"/><rect x="20" y="724" width="420" height="16" rx="6" fill="#c8553d"/>' +
       '<path d="M40 760 H420" stroke="#ffd166" stroke-width="18" stroke-dasharray="30 20"/>' +
       windowRow(70, 790, 2, 110, 84, 66, '#fff4e0') + '<rect x="300" y="810" width="90" height="140" rx="10" fill="#9c6644"/>' +
@@ -607,6 +620,13 @@
       '<rect x="-18" y="' + (hh + 8) + '" width="' + (w + 36) + '" height="12" rx="5" fill="#e9d8b4"/></g>';
   }
 
+  /* Bức tranh treo chính giữa phía trên bảng (file img/lop-hoc-tranh.jpg) trong khung vàng. Chạm vào để xem to. */
+  function wallPicture(x, y, w, hgt) {
+    return '<g data-hit="zone" data-id="cls-photo" transform="translate(' + x + ' ' + y + ')">' +
+      '<rect x="-7" y="-7" width="' + (w + 14) + '" height="' + (hgt + 14) + '" rx="5" fill="#b8860b"/><rect x="-4" y="-4" width="' + (w + 8) + '" height="' + (hgt + 8) + '" rx="3" fill="#e3b341"/>' +
+      '<image href="img/lop-hoc-tranh.jpg" width="' + w + '" height="' + hgt + '" preserveAspectRatio="xMidYMid slice"/></g>';
+  }
+
   /* o: {table: bảng nhân đang viết trên bảng, date: dòng "Thứ..., ngày... tháng..."} */
   function classroomScene(o) {
     o = o || {};
@@ -627,11 +647,23 @@
       if (i >= 9) fx += 1060;
       s += '<path d="M' + (fx - 15) + ' ' + fy.toFixed(1) + ' h30 l-15 32z" fill="' + flags[i % flags.length] + '"/>';
     }
-    s += '<rect x="560" y="14" width="480" height="48" rx="8" fill="#da251d"/><text x="800" y="47" text-anchor="middle" class="w-label" font-size="25" fill="#ffde00">Thi đua dạy tốt — học tốt</text>';
+    // Tranh treo chính giữa phía trên bảng, hai bên là khẩu hiệu "Dạy tốt — Học tốt"
+    s += '<rect x="548" y="28" width="138" height="44" rx="8" fill="#da251d"/><text x="617" y="59" text-anchor="middle" class="w-label" font-size="24" fill="#ffde00">Dạy tốt</text>' +
+      '<rect x="914" y="28" width="138" height="44" rx="8" fill="#da251d"/><text x="983" y="59" text-anchor="middle" class="w-label" font-size="24" fill="#ffde00">Học tốt</text>';
+    s += wallPicture(705, 11, 190, 96);
     // Cửa sổ nhìn ra sân, nắng chiếu xuống nền, chú chim đậu bậu cửa
-    s += roomWindow(64, 150, 136, 180) + roomWindow(236, 150, 136, 180);
-    s += '<path d="M70 452 L196 452 L330 650 L170 650Z M242 452 L368 452 L530 650 L370 650Z" fill="#fff" opacity=".3"/>';
-    s += bird(322, 338, '#ffb703');
+    s += roomWindow(64, 150, 136, 180);
+    s += '<path d="M70 452 L196 452 L330 650 L170 650Z" fill="#fff" opacity=".3"/>';
+    s += bird(150, 338, '#ffb703');
+    // Bảng "5 điều Bác Hồ dạy" (chạm vào để đọc chữ to)
+    var five = ['1. Yêu Tổ quốc,', 'yêu đồng bào', '2. Học tập tốt,', 'lao động tốt', '3. Đoàn kết tốt,', 'kỷ luật tốt', '4. Giữ gìn vệ sinh', 'thật tốt', '5. Khiêm tốn, thật thà,', 'dũng cảm'];
+    s += '<g data-hit="zone" data-id="cls-5dieu" transform="translate(226 130)"><rect x="-5" y="-5" width="170" height="216" rx="10" fill="#d4a017"/><rect width="160" height="206" rx="6" fill="#1d4e9e"/>' +
+      '<text x="80" y="24" text-anchor="middle" class="w-label" font-size="15" fill="#ffde00">5 ĐIỀU</text><text x="80" y="42" text-anchor="middle" class="w-label" font-size="15" fill="#ffde00">BÁC HỒ DẠY</text>' +
+      '<path d="M20 50 H140" stroke="#ffde00" stroke-width="2" opacity=".7"/>';
+    for (i = 0; i < five.length; i++) {
+      s += '<text x="' + (i % 2 ? 26 : 12) + '" y="' + (68 + i * 14.4).toFixed(1) + '" class="w-label" font-size="11.5" fill="#fff">' + five[i] + '</text>';
+    }
+    s += '</g>';
     // Bảng xanh
     s += '<g data-hit="zone" data-id="cls-board" class="room-board">' +
       '<rect x="406" y="118" width="788" height="264" rx="10" fill="#a0673b"/><rect x="418" y="130" width="764" height="240" rx="4" fill="url(#rboard)"/>' +

@@ -22,7 +22,9 @@
 
   /* Trong lớp: nhãn dạng thẻ nhỏ đặt ngay trên đồ vật. seat: chỗ ngồi của bạn nhỏ. */
   var ROOM_ZONES = [
-    { id: 'cls-board', name: 'Bảng lớp', icon: 'classroom', mx: 800, my: 92, tx: 800, ty: 505, pill: true, face: 'up' },
+    { id: 'cls-board', name: 'Bảng lớp', icon: 'classroom', mx: 540, my: 414, tx: 800, ty: 505, pill: true, face: 'up' },
+    { id: 'cls-photo', name: 'Xem tranh', icon: 'art', mx: 800, my: 60, tx: 800, ty: 505, noSpot: true, face: 'up' },
+    { id: 'cls-5dieu', name: '5 điều Bác Hồ dạy', icon: 'star', mx: 306, my: 120, tx: 400, ty: 500, noSpot: true, face: 'up' },
     { id: 'cls-desk', name: 'Bàn học', icon: 'desk', mx: 730, my: 566, tx: 648, ty: 742, pill: true, seat: { x: 748, y: 732 } },
     { id: 'cls-door', name: 'Ra sân', icon: 'door', mx: 1450, my: 116, tx: 1450, ty: 480, pill: true, face: 'up' }
   ];
@@ -31,6 +33,7 @@
     { id: 'binh', name: 'Chú Bình', kind: 'adult', art: 'binh', x: 1425, y: 1175 },
     { id: 'nam', name: 'Thầy Nam', kind: 'adult', art: 'nam', x: 1520, y: 925 },
     { id: 'hoa', name: 'Cô Hoa', kind: 'adult', art: 'hoa', x: 1760, y: 705 },
+    { id: 'lan', name: 'Cô Lan', kind: 'adult', art: 'lan', x: 885, y: 990 },
     { id: 'k0', kind: 'kid', idx: 0, x: 2010, y: 1030 },
     { id: 'k1', kind: 'kid', idx: 1, x: 1880, y: 1350 },
     { id: 'k2', kind: 'kid', idx: 2, x: 720, y: 960 },
@@ -41,10 +44,10 @@
   var SCENES = {
     yard: {
       w: 2400, h: 1500, walk: { x0: 70, x1: 2330, y0: 700, y1: 1420 }, start: { x: 1250, y: 1010 },
-      speed: 460, camDy: 120, bg: '#bfe8a0', step: 'step', zones: ZONES,
+      speed: 460, camDy: 120, bg: '#bfe8a0', top: '#aee2ff', step: 'step', zones: ZONES, depth: true,
       flock: [[1010, 985], [1495, 1195], [705, 1135], [1705, 1015]],
       blocks: [
-        [30, 690, 440, 958], [100, 990, 262, 1040],                 // nhà ăn, bàn ăn ngoài trời
+        [30, 690, 472, 958], [100, 990, 262, 1040],                 // nhà ăn (cả mặt bên), bàn ăn ngoài trời
         [885, 800, 1065, 852], [1215, 866, 1285, 892],              // bảng tin, cột cờ
         [555, 850, 685, 938], [1815, 850, 1945, 938],               // cây bóng mát + ghế đá
         [980, 1040, 1140, 1082], [1360, 1040, 1520, 1082],          // bồn hoa giữa sân
@@ -57,7 +60,7 @@
     },
     classroom: {
       w: 1600, h: 1000, walk: { x0: 70, x1: 1530, y0: 470, y1: 975 }, start: { x: 1450, y: 500 },
-      speed: 400, camDy: 150, bg: '#f5e4c8', step: 'stepWood', zones: ROOM_ZONES, flock: [], blocks: null,
+      speed: 400, camDy: 150, bg: '#f5e4c8', top: '#fff7dc', step: 'stepWood', zones: ROOM_ZONES, flock: [], blocks: null,
       label: 'Bên trong lớp học. Dùng phím mũi tên để đi tới bảng lớp, bàn học hoặc cửa ra sân.'
     }
   };
@@ -73,6 +76,12 @@
     }
   }
 
+  /* Ở sân trường, người đứng xa (phía trên màn hình) nhỏ hơn người đứng gần: sân có chiều sâu như nhìn chếch từ trên xuống */
+  function depthScale(sc, y) {
+    if (!sc.depth) return 1;
+    return 0.82 + 0.3 * (y - sc.walk.y0) / (sc.walk.y1 - sc.walk.y0);
+  }
+
   /* ---------------- Dựng cảnh ---------------- */
   function wrap(y, cls, attrs, inner) { return '<g class="actor ' + cls + '" data-y="' + y + '"' + (attrs || '') + '>' + inner + '</g>'; }
 
@@ -85,7 +94,7 @@
       return wrap(n.y, 'npc', ' data-hit="npc" data-id="' + n.id + '" transform="translate(' + (n.x - 46.8) + ' ' + (n.sy - 117) + ') scale(.78)"',
         '<rect x="14" y="20" width="92" height="130" fill="transparent"/>' + A.kidSeat(name, n.idx) + nameTag(name, n.hi ? -30 : 4));
     }
-    var adult = n.kind === 'adult', hgt = adult ? 220 : 200, sc = adult ? 0.85 : 0.78;
+    var adult = n.kind === 'adult', hgt = adult ? 220 : 200, sc = (adult ? 0.85 : 0.78) * depthScale(st.sc, n.y);
     return wrap(n.y, 'npc', ' data-hit="npc" data-id="' + n.id + '" transform="translate(' + (n.x - 60 * sc) + ' ' + (n.y - hgt * sc) + ') scale(' + sc + ')"',
       '<rect x="0" y="0" width="120" height="' + hgt + '" fill="transparent"/>' + (adult ? A.adult(n.art) : A.kid(name, n.idx)) + nameTag(name, -14));
   }
@@ -114,7 +123,8 @@
     ['mit', 'bong', 'dau'].forEach(function (k) {
       if (k === p.pet) return;
       var pp = penPos[pi++];
-      list.push({ y: pp[1], s: wrap(pp[1], 'pen-pet', ' data-hit="zone" data-id="pets" transform="translate(' + (pp[0] - 45) + ' ' + (pp[1] - 90) + ') scale(.9)"', '<g class="bob">' + A.pet(k, p.petAcc[k]) + '</g>') });
+      var ps = 0.9 * depthScale(st.sc, pp[1]);
+      list.push({ y: pp[1], s: wrap(pp[1], 'pen-pet', ' data-hit="zone" data-id="pets" transform="translate(' + (pp[0] - 50 * ps) + ' ' + (pp[1] - 100 * ps) + ') scale(' + ps + ')"', '<g class="bob">' + A.pet(k, p.petAcc[k]) + '</g>') });
     });
     // Chim sẻ nhặt thóc trên sân: lại gần là bay lên
     var colors = ['#ffb703', '#8ecae6', '#ff8fab', '#95d5b2'];
@@ -166,7 +176,7 @@
     var hot = '';
     sc.zones.forEach(function (z) {
       if (z.needDiv && !divOn) return; // không tạo điểm tương tác cho hoạt động đang tắt
-      hot += hotspotSvg(z);
+      if (!z.noSpot) hot += hotspotSvg(z); // noSpot: đồ vật trong cảnh tự là chỗ để chạm
     });
     content.actors.sort(function (a, b) { return a.y - b.y; });
     world.innerHTML = '<svg class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + sc.w + ' ' + sc.h + '" width="' + sc.w + '" height="' + sc.h + '">' +
@@ -175,6 +185,10 @@
       '<g class="actor companion" data-y="0"><g class="pet-inner">' + A.pet(p.pet, p.petAcc[p.pet]) + '</g></g>' +
       '<g class="actor player" data-y="0"><g class="player-flip"><g class="player-inner"><g class="pv-front">' + A.girl(p.look) + '</g><g class="pv-back">' + A.girlBack(p.look) + '</g></g></g></g>' +
       '</g><g class="hotspots">' + hot + '</g></svg>';
+    // Nhà nào chưa có ảnh riêng (img/lop-hoc-tranh.jpg) thì treo tranh mặc định
+    Array.prototype.forEach.call(world.querySelectorAll('image'), function (im) {
+      im.addEventListener('error', function () { if (!/tranh-mac-dinh/.test(im.getAttribute('href'))) im.setAttribute('href', 'img/tranh-mac-dinh.svg'); });
+    });
     var mark = h('div', { class: 'walk-mark', hidden: true });
     var bubble = h('div', { class: 'player-bubble', hidden: true });
     world.appendChild(mark); world.appendChild(bubble);
@@ -209,7 +223,7 @@
     if (root.visualViewport) root.visualViewport.addEventListener('resize', st.onResize);
     layout(false);
     placeActors();
-    centerOn(st.player.x, st.player.y - sc.camDy, 1);
+    centerOn(st.player.x, st.player.y - camDy(), 1);
     st.raf = requestAnimationFrame(loop);
   }
 
@@ -247,6 +261,11 @@
     var vw = Math.max(1, r.width), vh = Math.max(1, r.height);
     var cx = st.cam.x + (st.vw || vw) / 2 / st.scale, cy = st.cam.y + (st.vh || vh) / 2 / st.scale;
     st.scale = fitScale(st.key, vw, vh); st.vw = vw; st.vh = vh;
+    // Màn hình ngang thấp: thanh trên nổi đè lên bản đồ. Cho máy quay lùi thêm đúng chiều cao thanh đó
+    // để mép trên của cảnh (mái trường, tranh trên bảng) không bị che.
+    var hud = document.getElementById('hud');
+    st.padTop = hud && root.getComputedStyle(hud).position === 'absolute' ? hud.offsetHeight : 0;
+    st.el.vp.style.background = st.padTop ? 'linear-gradient(' + st.sc.top + ' 0 ' + st.padTop + 'px, ' + st.sc.bg + ' ' + st.padTop + 'px)' : '';
     if (keep) centerOn(cx, cy, 1); else applyCam();
   }
 
@@ -254,7 +273,7 @@
     var W = st.sc.w, H = st.sc.h;
     var maxX = Math.max(0, W - st.vw / st.scale), maxY = Math.max(0, H - st.vh / st.scale);
     st.cam.x = Math.max(0, Math.min(maxX, st.cam.x));
-    st.cam.y = Math.max(0, Math.min(maxY, st.cam.y));
+    st.cam.y = Math.max(-(st.padTop || 0) / st.scale, Math.min(maxY, st.cam.y));
     // Khi màn hình rộng hơn thế giới: căn giữa
     st.offX = W * st.scale < st.vw ? (st.vw - W * st.scale) / 2 : 0;
     st.offY = H * st.scale < st.vh ? (st.vh - H * st.scale) / 2 : 0;
@@ -263,6 +282,9 @@
     clampCam();
     st.el.world.style.transform = 'translate(' + (st.offX - st.cam.x * st.scale).toFixed(1) + 'px,' + (st.offY - st.cam.y * st.scale).toFixed(1) + 'px) scale(' + st.scale + ')';
   }
+  /* Điểm máy quay nhắm tới: phía trên đầu bạn nhỏ một đoạn (thêm phần bị thanh trên che, nếu có) */
+  function camDy() { return st.sc.camDy + (st.padTop || 0) / st.scale; }
+
   /* k = 1: nhảy tới ngay; k nhỏ hơn: trượt dần tới */
   function centerOn(x, y, k) {
     var tx = x - st.vw / 2 / st.scale, ty = y - st.vh / 2 / st.scale;
@@ -287,15 +309,16 @@
 
   function placeActors() {
     var p = st.player, e = st.el, s = st.seated;
-    var px = s ? s.x : p.x, top = s ? s.y - 136 : p.y - 170, depth = s ? s.y + 23 : p.y;
+    var k = 0.85 * depthScale(st.sc, p.y), kp = 0.72 * depthScale(st.sc, st.pet.y);
+    var px = s ? s.x : p.x, top = s ? s.y - 136 : p.y - 200 * k, depth = s ? s.y + 23 : p.y;
     var sig = px.toFixed(1) + '|' + top.toFixed(1) + '|' + p.dir + '|' + (p.back ? 1 : 0) + '|' + st.pet.x.toFixed(1) + '|' + st.pet.y.toFixed(1);
     if (sig === st.sig) return;
     st.sig = sig;
-    e.player.setAttribute('transform', 'translate(' + (px - 51).toFixed(1) + ' ' + top.toFixed(1) + ') scale(.85)');
+    e.player.setAttribute('transform', 'translate(' + (px - 60 * k).toFixed(1) + ' ' + top.toFixed(1) + ') scale(' + k.toFixed(3) + ')');
     e.flip.setAttribute('transform', p.dir < 0 ? 'translate(120 0) scale(-1 1)' : '');
     e.player.classList.toggle('back', !!(p.back || s));
     e.player.classList.toggle('seated', !!s);
-    e.pet.setAttribute('transform', 'translate(' + (st.pet.x - 36).toFixed(1) + ' ' + (st.pet.y - 72).toFixed(1) + ') scale(.72)');
+    e.pet.setAttribute('transform', 'translate(' + (st.pet.x - 50 * kp).toFixed(1) + ' ' + (st.pet.y - 100 * kp).toFixed(1) + ') scale(' + kp.toFixed(3) + ')');
     e.bubble.style.left = px + 'px';
     e.bubble.style.top = (top - 30) + 'px';
     sortActor(e.pet, st.pet.y);
@@ -414,7 +437,7 @@
     if (U.reducedMotion()) {
       p.x = end.x; p.y = end.y; st.pet.x = p.x - 70; st.pet.y = p.y + 10;
       st.target = null; st.el.mark.hidden = true;
-      placeActors(); centerOn(p.x, p.y - st.sc.camDy, 1);
+      placeActors(); centerOn(p.x, p.y - camDy(), 1);
       if (cb) setTimeout(cb, 60);
       return;
     }
@@ -471,7 +494,8 @@
       if (st.target) { st.target = null; st.el.mark.hidden = true; }
       stand();
       st.follow = true;
-      step(ix * sc.speed * dt, iy * sc.speed * dt);
+      var v = sc.speed * depthScale(sc, p.y) * dt; // ở xa thì bước ngắn hơn trên màn hình
+      step(ix * v, iy * v);
       face(ix, iy);
       moved = true; // chạm vật cản vẫn bước tại chỗ, để bé thấy phím có tác dụng
     } else if (st.target) {
@@ -481,7 +505,7 @@
         else if (!t.chase) reach();
       } else {
         var last = t.i === t.pts.length - 1;
-        var sp = Math.min(sc.speed * 1.15, last ? 110 + d * 5 : 1e9) * dt;
+        var sp = Math.min(sc.speed * 1.15, last ? 110 + d * 5 : 1e9) * depthScale(sc, p.y) * dt;
         if (sp > d) sp = d;
         moved = step(dx / d * sp, dy / d * sp, Math.abs(dx), Math.abs(dy));
         face(dx, dy);
@@ -503,7 +527,7 @@
     var gx = p.x - 70 * p.dir, gy = p.y + 10, pk = Math.min(1, dt * 5);
     if (Math.abs(gx - st.pet.x) + Math.abs(gy - st.pet.y) > 0.4) { st.pet.x += (gx - st.pet.x) * pk; st.pet.y += (gy - st.pet.y) * pk; }
     placeActors();
-    if (st.follow && !(st.drag && st.drag.pan)) centerOn(p.x, p.y - sc.camDy, 1 - Math.pow(0.88, dt * 60));
+    if (st.follow && !(st.drag && st.drag.pan)) centerOn(p.x, p.y - camDy(), 1 - Math.pow(0.88, dt * 60));
     updateFlock(now);
     updateNear(now);
   }

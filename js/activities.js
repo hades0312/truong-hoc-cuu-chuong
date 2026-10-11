@@ -432,7 +432,8 @@
     var lines = {
       binh: ['Chào ' + name + '! Chú Bình chúc con một ngày học vui nhé.', 'Nhớ rửa tay trước khi ăn nha con!', 'Cổng khám phá bên trái dẫn sang đảo thú cưng đó.'],
       hang: ['Cô Hằng đây! Con lên bảng lớp, mình học phép nhân bằng hình nhé.', 'Phép nhân là cộng các nhóm bằng nhau đó con.', 'Sai cũng không sao, mình nhìn hình rồi thử lại.', 'Con về bàn học ngồi, cô trò mình cùng luyện vài câu nhé.'],
-      nam: ['Thầy Nam có nhiệm vụ khám phá cho con đây!', 'Hôm nay mình thử một nhiệm vụ mới nhé?', 'Mỗi nhiệm vụ chỉ vài câu thôi, làm xong mình nghỉ.'],
+      lan: ['Hello! Cô là cô Lan, dạy Tiếng Anh. How are you today?', 'Mỗi ngày học vài từ mới là con giỏi Tiếng Anh ngay thôi.', 'Con nhớ nghe máy đọc rồi đọc theo thật to nhé!'],
+      nam: ['Thầy Nam dạy Khoa học đây. Con có biết vì sao có mưa không?', 'Hôm nay mình thử một nhiệm vụ mới nhé?', 'Mỗi nhiệm vụ chỉ vài câu thôi, làm xong mình nghỉ.'],
       hoa: ['Thư viện có trò ghép thẻ phép tính đó con.', 'Cô Hoa thích nhất là bạn nào đọc kỹ câu hỏi.', 'Ghép đúng thẻ là con nhớ thêm một phép tính rồi!'],
       kid: ['Chào ' + name + '! Mình cùng chơi nhé!', 'Mình hay nhớ bảng 5 bằng cách đếm 5, 10, 15...', 'Bảng 9 có mẹo hay lắm: 10 nhóm rồi bớt 1 nhóm!', 'Ra sân thể thao chuyền bóng với mình không?'],
       seat: ['Chào ' + name + '! Bàn của bạn ở giữa hàng đầu đó.', 'Tớ đang chép bảng nhân trên bảng lớp nè.', 'Bảng 2 dễ lắm: cứ đếm cách 2 là ra!', 'Tí nữa ra chơi mình ra sân nghe chim hót nhé!']

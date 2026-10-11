@@ -348,7 +348,32 @@
   }
   if (synth) {
     findVoice();
-    try { synth.addEventListener('voiceschanged', function () { findVoice(); document.dispatchEvent(new Event('tt-voices')); }); } catch (e) { /* cũ */ }
+    try { synth.addEventListener('voiceschanged', function () { findVoice(); findEn(); document.dispatchEvent(new Event('tt-voices')); }); } catch (e) { /* cũ */ }
+  }
+
+  /* Giọng tiếng Anh cho môn Tiếng Anh: ưu tiên giọng Anh-Anh như sách giáo khoa, không có thì giọng Anh-Mỹ */
+  var enVoice = null;
+  function findEn() {
+    if (!synth || !synth.getVoices) return null;
+    var vs = synth.getVoices() || [], gb = null, us = null, any = null;
+    for (var i = 0; i < vs.length; i++) {
+      if (/^en[-_]GB/i.test(vs[i].lang)) gb = gb || vs[i];
+      else if (/^en[-_]US/i.test(vs[i].lang)) us = us || vs[i];
+      else if (/^en/i.test(vs[i].lang)) any = any || vs[i];
+    }
+    enVoice = gb || us || any;
+    return enVoice;
+  }
+  function canSpeakEn() { return enabled && !!(synth && (enVoice || findEn())); }
+  function speakEn(text) {
+    if (!canSpeakEn()) return false;
+    try {
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(String(text));
+      u.voice = enVoice; u.lang = enVoice.lang; u.rate = 0.82;
+      synth.speak(u);
+      return true;
+    } catch (e) { return false; }
   }
 
   function canSpeak() { return !!(synth && (viVoice || findVoice())); }
@@ -373,6 +398,6 @@
     get enabled() { return enabled; },
     get state() { return { scene: amb.key, focus: amb.focus, on: amb.on, unlocked: unlocked }; },
     unlock: function () { unlocked = true; ac(); startAmb(); },
-    canSpeak: canSpeak, speak: speak
+    canSpeak: canSpeak, speak: speak, canSpeakEn: canSpeakEn, speakEn: speakEn
   };
 })(window);
