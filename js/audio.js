@@ -144,6 +144,17 @@
     bikebell: function (v, o) { tone(2400, 0, 0.3, 'sine', v * 0.7, { dest: o.dest, pan: o.pan, attack: 0.003 }); tone(2400, 0.16, 0.4, 'sine', v * 0.6, { dest: o.dest, pan: o.pan, attack: 0.003 }); } // chuông xe đạp
   };
 
+  /* Tiếng vật nuôi ở cảnh "Nhà em" (v: độ to; o.dest, o.pan như các tiếng khác) */
+  var FARM = {
+    cluck: function (v, o) { for (var i = 0; i < 4; i++) tone(i === 3 ? 760 : 560, i * 0.13, 0.08, 'square', v * 0.35, { to: i === 3 ? 980 : 480, attack: 0.004, dest: o.dest, pan: o.pan }); },       // cục cục cục tác
+    rooster: function (v, o) { whistle([[0, 520], [0.12, 760], [0.24, 700], [0.38, 980], [0.8, 900], [1.05, 560]], 0, v * 0.5, { type: 'sawtooth', dest: o.dest, pan: o.pan }); },                    // ò ó o
+    quack: function (v, o) { tone(520, 0, 0.13, 'sawtooth', v * 0.4, { to: 360, attack: 0.006, dest: o.dest, pan: o.pan }); tone(500, 0.19, 0.15, 'sawtooth', v * 0.4, { to: 330, attack: 0.006, dest: o.dest, pan: o.pan }); },
+    woof: function (v, o) { tone(310, 0, 0.13, 'sawtooth', v * 0.55, { to: 150, attack: 0.004, dest: o.dest, pan: o.pan }); tone(290, 0.24, 0.15, 'sawtooth', v * 0.55, { to: 140, attack: 0.004, dest: o.dest, pan: o.pan }); },
+    meow: function (v, o) { whistle([[0, 520], [0.12, 800], [0.42, 470]], 0, v, { type: 'triangle', dest: o.dest, pan: o.pan }); },
+    oink: function (v, o) { tone(210, 0, 0.11, 'square', v * 0.4, { to: 150, attack: 0.006, dest: o.dest, pan: o.pan }); tone(230, 0.17, 0.14, 'square', v * 0.4, { to: 140, attack: 0.006, dest: o.dest, pan: o.pan }); },
+    moo: function (v, o) { whistle([[0, 150], [0.25, 190], [0.8, 135]], 0, v * 1.2, { type: 'sawtooth', dest: o.dest, pan: o.pan }); }
+  };
+
   function petVoice(kind, v, o) {
     var d = { dest: o && o.dest, pan: o && o.pan };
     if (kind === 'bong') {              // thỏ: hai tiếng chít nhỏ
@@ -217,7 +228,9 @@
     splash: function () { hiss(0, 0.4, 0.06, { filter: 'lowpass', freq: 2200, to: 500, attack: 0.03 }); },
     ding: function () { tone(1320, 0, 0.25, 'sine', 0.09, { attack: 0.004 }); tone(1760, 0.14, 0.4, 'sine', 0.08, { attack: 0.004 }); }, // đèn xanh cho người đi bộ
     moo: function () { whistle([[0, 150], [0.25, 190], [0.8, 135]], 0, 0.09, { type: 'sawtooth' }); },                                 // nghé ọ
-    horn: function () { tone(440, 0, 0.22, 'square', 0.025); tone(554, 0, 0.22, 'square', 0.02); }
+    horn: function () { tone(440, 0, 0.22, 'square', 0.025); tone(554, 0, 0.22, 'square', 0.02); },
+    cluck: function () { FARM.cluck(0.08, {}); }, rooster: function () { FARM.rooster(0.08, {}); }, quack: function () { FARM.quack(0.08, {}); },
+    woof: function () { FARM.woof(0.08, {}); }, meow: function () { FARM.meow(0.07, {}); }, oink: function () { FARM.oink(0.08, {}); }
   };
 
   function play(name) {
@@ -235,6 +248,7 @@
   var AMB = {
     title: { vol: 1, bed: 'wind', gap: [1.1, 3.2], ev: [['se', 4], ['chich', 3], ['tweet', 2], ['cu', 1], ['music', 3]] },
     road: { vol: 1, bed: 'wind', gap: [1.1, 3.2], ev: [['se', 4], ['chich', 3], ['cu', 3], ['tweet', 2], ['horn', 1], ['bikebell', 1], ['music', 1]] },
+    home: { vol: 1, bed: 'wind', gap: [1.2, 3.4], ev: [['se', 4], ['chich', 3], ['cu', 3], ['tweet', 2], ['cluck', 3], ['rooster', 1], ['quack', 2], ['woof', 1], ['moo', 1], ['splash', 1]] },
     yard: { vol: 1, bed: 'wind', gap: [1, 3], ev: [['se', 5], ['chich', 4], ['trill', 2], ['cu', 2], ['tweet', 2], ['music', 2]] },
     classroom: { vol: 0.8, bed: 'room', tick: true, muffle: 2600, gap: [2.4, 6], ev: [['se', 3], ['cu', 2], ['chich', 2]] },
     library: { vol: 0.6, bed: 'room', tick: true, muffle: 1800, gap: [4, 9], ev: [['cu', 2], ['page', 3], ['se', 1]] },
@@ -276,6 +290,7 @@
     if (BIRDS[name]) BIRDS[name](0, v, o);
     else if (name === 'music') phrase(0.035, { dest: ambBus });
     else if (EXTRA[name]) EXTRA[name](v, o);
+    else if (FARM[name]) FARM[name](v, o);
   }
 
   function queue(ms) {

@@ -32,7 +32,7 @@
         { q: 'Vừa đi bộ sang đường vừa xem điện thoại thì thế nào?', a: 'Rất nguy hiểm vì không nhìn thấy xe', wrong: ['Không sao vì xe sẽ tự tránh', 'An toàn hơn vì đỡ sợ'], why: 'Khi sang đường phải tập trung quan sát, không xem điện thoại, không đeo tai nghe.' }
       ] },
       /* Trường em, quê em: chỉ hỏi những điều đã đối chiếu (xem ghi chú trong tour.js) */
-      { id: 'truongem', name: 'Trường em, quê em', icon: '🏫', teacher: 'hang', tname: 'Cô Hằng', items: [
+      { id: 'truongem', name: 'Trường em, quê em', icon: '🏫', teacher: 'hang', tname: 'Cô Hằng', defaultSchool: true, items: [
         { q: 'Trường của chúng mình tên là gì?', a: 'Trường Tiểu học Tân Trường', wrong: ['Trường Tiểu học Trường Lâm', 'Trường Tiểu học Nghi Sơn'], why: 'Trường mình là Trường Tiểu học Tân Trường.', pic: '🏫' },
         { q: 'Trường mình ở xã nào?', a: 'Xã Trường Lâm', wrong: ['Xã Thanh Kỳ', 'Phường Trúc Lâm'], why: 'Trường Tiểu học Tân Trường ở xã Trường Lâm, tỉnh Thanh Hoá.' },
         { q: 'Xã Trường Lâm thuộc tỉnh nào?', a: 'Tỉnh Thanh Hoá', wrong: ['Tỉnh Nghệ An', 'Tỉnh Ninh Bình'], why: 'Xã Trường Lâm nằm ở cửa ngõ phía đông nam của tỉnh Thanh Hoá.' },

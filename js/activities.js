@@ -493,13 +493,14 @@
     var steps = [
       ['walk', 'Đi lại', touch ? 'Giữ ngón tay trên vòng tròn ở góc trái và nghiêng về hướng con muốn đi. Con cũng có thể chạm vào nơi muốn tới.' : 'Dùng phím mũi tên hoặc W A S D. Con cũng có thể nhấn giữ chuột, bạn nhỏ sẽ đi theo.'],
       ['door', 'Vào một nơi', 'Đứng gần cửa lớp, thư viện, vườn… sẽ hiện nút vàng. ' + (touch ? 'Chạm nút vàng để vào.' : 'Nhấn Enter hoặc bấm nút vàng để vào.') + ' Thanh “Đi nhanh” đưa con tới thẳng từng nơi.'],
+      ['home', 'Ở nhà', 'Mỗi lần vào chơi, con bắt đầu ở nhà. Ở nhà có ao cá, vườn rau, chuồng gà… Mỗi nơi dạy con một điều để giữ an toàn. Giúp ông bà việc nhà còn được thưởng sao. Chạm “Đi học” ở cổng nhà để ra đường tới trường.'],
       ['hint', 'Đường tới trường', 'Đi trên vỉa hè tới vạch sang đường. Đèn cho người đi bộ đỏ thì đứng chờ, đèn xanh thì nhìn hai bên rồi sang. Sang đúng luật được thưởng sao!'],
       ['book', 'Học và luyện', 'Chạm “Bảng lớp” hoặc “Môn học” để chọn Cửu chương, Toán, Khoa học, Tiếng Anh, Kỹ năng sống. Mỗi lượt có 6 câu.'],
       ['speak', 'Làm sai không sao cả', 'Sai lần đầu sẽ có gợi ý. Sai lần nữa, cô sẽ chỉ đáp án và giải thích. Câu đó lát sau được hỏi lại để con nhớ.'],
       ['star', 'Ngôi sao để làm gì?', 'Xong mỗi lượt con được ngôi sao và bánh cho thú. Dùng sao để trang trí đảo và mua phụ kiện cho thú cưng.'],
       ['art', 'Tô màu nhân vật', 'Vào Phòng Mỹ thuật để tô màu tóc, áo, váy, giày, ba lô cho nhân vật thật xinh theo ý con.'],
       ['pets', 'Trò chuyện và khám phá', 'Chạm vào thầy cô, các bạn, chú chim, cái cây, lá cờ, vòi rửa tay… Ai cũng có điều muốn nói với con.'],
-      ['home', 'Nghỉ ngơi', 'Chơi một lúc thì cho mắt nghỉ nhé. Tiến độ của con được lưu lại, lần sau vào chơi tiếp.']
+      ['review', 'Nghỉ ngơi', 'Chơi một lúc thì cho mắt nghỉ nhé. Tiến độ của con được lưu lại, lần sau vào chơi tiếp.']
     ];
     var list = h('ol', { class: 'guide-list' });
     steps.forEach(function (st) {
@@ -537,6 +538,18 @@
         'Ngồi xe máy nhớ đội mũ bảo hiểm và cài quai cẩn thận.', 'Không chơi đùa dưới lòng đường, nguy hiểm lắm.', 'Đi bộ thì đi trên vỉa hè, sát mép đường.', 'Con muốn học thêm về an toàn giao thông không? Chú có vài câu đố đây.', 'Chúc con đi học vui! Qua đường nhớ chờ đèn xanh.'],
       nong: ['Chào cháu! Bác đang thăm đồng. Lúa năm nay tốt lắm.', 'Hạt gạo cháu ăn là từ cây lúa này đấy. Làm ra hạt gạo vất vả lắm.', 'Con trâu là bạn của nhà nông, giúp bác cày ruộng.',
         'Cò trắng hay về đồng bắt tôm tép.', 'Cháu ăn cơm nhớ ăn hết, đừng bỏ thừa nhé.', 'Trời nắng thì lúa mau chín, trời mưa thì lúa có nước.', 'Đi học chăm ngoan nhé cháu!'],
+      ong: ['Cháu của ông đi học về rồi đấy à? Vào vườn xem rau với ông nào.', 'Rau nhà mình trồng, ông không phun thuốc, ăn rất yên tâm.', 'Tưới rau thì tưới sáng sớm hoặc chiều mát cháu ạ.',
+        'Giếng sâu lắm, cháu đừng cúi nhìn xuống nhé.', 'Ngày xưa ông đi học phải lội bộ mấy cây số, không có đường đẹp như bây giờ đâu.', 'Ăn quả nhớ kẻ trồng cây, cháu nhé.',
+        'Con trâu, con bò là bạn của nhà nông. Cháu đừng đứng sát phía sau chúng.', 'Cháu ' + name + ' chăm học thế này, ông vui lắm!'],
+      ba: ['Cháu ngoan của bà! Đi học về có mệt không cháu?', 'Vào rửa tay, rửa mặt cho mát rồi ăn cơm cháu nhé.', 'Ở nhà một mình thì đừng mở cửa cho người lạ, cháu nhớ chưa?',
+        'Tay ướt thì không được sờ vào ổ điện đâu đấy.', 'Thuốc trong tủ không phải kẹo. Cháu chỉ uống thuốc khi người lớn đưa.', 'Chơi với gà vịt, chó mèo xong nhớ rửa tay bằng xà phòng.',
+        'Đi đâu cũng phải xin phép, nói rõ đi với ai, bao giờ về.', 'Bà kể chuyện cổ tích cho ' + name + ' nghe nhé? Ngày xửa ngày xưa…', 'Cháu giúp bà cho gà ăn nhé. Việc nhỏ thôi mà bà vui lắm.'],
+      me: [name + ' về rồi đấy à! Mẹ đang nấu cơm, thơm chưa?', 'Bếp đang nóng, con đứng xa ra một chút nhé.', 'Nấu xong mẹ luôn tắt bếp và khoá van ga.',
+        'Diêm với bật lửa là đồ của người lớn, con không nghịch nhé.', 'Nếu có cháy, con chạy ra ngoài, hô to “Cháy! Cháy!” rồi gọi 114.', 'Con thuộc số điện thoại của bố mẹ chưa? Phải thuộc để khi cần còn gọi.',
+        'Sạc điện thoại thì để trên bàn, không để dưới gối con ạ.', 'Hôm nay ở lớp có gì vui, kể mẹ nghe nào?', 'Cơm sắp chín rồi. Con mời ông bà vào ăn cơm giúp mẹ nhé.'],
+      bo: ['Con về rồi à! Bố đang xem lại cái thuyền.', 'Sông sâu và nước chảy xiết. Con không ra bờ sông một mình nhé.', 'Đi thuyền thì ai cũng phải mặc áo phao, kể cả người biết bơi.',
+        'Thấy ai bị đuối nước, con hô to gọi người lớn và ném phao. Tuyệt đối không nhảy xuống.', 'Hè này bố cho con đi học bơi ở bể bơi có thầy dạy nhé.', 'Trời có sấm sét thì vào nhà ngay, không trú dưới gốc cây to.',
+        'Mùa mưa lũ nước lên nhanh lắm, con không lội qua chỗ nước chảy xiết.', 'Ao nhà mình sâu hơn con tưởng đấy. Con không chơi sát mép ao nhé.', 'Con của bố giỏi lắm! Cố gắng học nhé ' + name + '.'],
       kid: ['Chào ' + name + '! Mình cùng chơi nhé!', 'Mình hay nhớ bảng 5 bằng cách đếm 5, 10, 15...', 'Bảng 9 có mẹo hay lắm: 10 nhóm rồi bớt 1 nhóm!', 'Ra sân thể thao chuyền bóng với mình không?',
         'Cậu chạm vào chú chim trên sân chưa? Nó hót hay lắm!', 'Tớ vừa được 3 ngôi sao ở Vườn toán học đấy.', 'Cậu tô màu nhân vật ở Phòng Mỹ thuật chưa? Vui lắm!', 'Sáng nay tớ chờ đèn xanh mới sang đường, được chú Cảnh sát khen.',
         'Cô Lan dạy tớ nói "Good morning". Good morning, ' + name + '!', 'Tớ thích môn Khoa học nhất vì được biết vì sao có mưa.', 'Giờ ra chơi mình ra ghế đá ngồi nhé.', pet.charAt(0).toUpperCase() + pet.slice(1) + ' của cậu đáng yêu quá!'],

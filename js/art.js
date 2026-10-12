@@ -240,8 +240,14 @@
       binh: { top: '#d4a373', bottom: '#5e503f', hair: 'cap', extra: 'whistle' },
       congan: { top: '#e2c275', bottom: '#b9964a', hair: 'cap', extra: 'whistle', cap: '#d8b45c', band: '#c1121f' }, // cảnh sát giao thông
       tam: { top: '#ffffff', bottom: '#ffffff', hair: 'bun', extra: 'apron', dress: true },                          // cô cấp dưỡng
-      nong: { top: '#8d6e63', bottom: '#5e503f', hair: 'non', extra: '' }                                             // bác nông dân đội nón lá
+      nong: { top: '#8d6e63', bottom: '#5e503f', hair: 'non', extra: '' },                                            // bác nông dân đội nón lá
+      // Gia đình của bé ở cảnh "Nhà em"
+      ong: { top: '#c9a27a', bottom: '#6b5b4b', hair: 'short', hc: '#e9ecef', extra: 'beard' },
+      ba: { top: '#9b7bb8', bottom: '#3d3d4a', hair: 'bun', hc: '#dee2e6', extra: '', glasses: true },
+      bo: { top: '#74b3ce', bottom: '#3d4f6b', hair: 'short', extra: '' },
+      me: { top: '#ffb5a7', bottom: '#5b5f97', hair: 'bun', extra: 'tapde' }
     }[kind];
+    var hc = conf.hc || HAIR;
     s += '<rect x="46" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/><rect x="62" y="160" width="12" height="46" rx="5" fill="' + (conf.dress ? SKIN : conf.bottom) + '"/>';
     s += '<rect x="42" y="202" width="18" height="10" rx="5" fill="#3a3a3a"/><rect x="60" y="202" width="18" height="10" rx="5" fill="#3a3a3a"/>';
     if (conf.dress) s += '<path d="M38 98 Q60 90 82 98 L90 190 L30 190 Z" fill="' + conf.top + '"/><path d="M60 100 L60 190" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>';
@@ -253,17 +259,19 @@
     if (conf.extra === 'abc') s += '<rect x="73" y="118" width="32" height="25" rx="4" fill="#fff" stroke="#118ab2" stroke-width="2.5"/><text x="89" y="136" text-anchor="middle" class="w-label" font-size="12" fill="#118ab2">ABC</text>';
     if (conf.extra === 'whistle') s += '<path d="M50 98 Q60 120 70 98" stroke="#e63946" stroke-width="2" fill="none"/><rect x="56" y="116" width="10" height="6" rx="3" fill="#bbb"/>';
     s += '<rect x="54" y="84" width="12" height="14" fill="' + SKIN_SH + '"/>';
-    if (conf.hair === 'long') s += '<path d="M28 56 Q22 108 40 112 L80 112 Q98 108 92 56 Z" fill="' + HAIR + '"/>';
-    if (conf.hair === 'bun') s += '<circle cx="60" cy="22" r="14" fill="' + HAIR + '"/>';
-    s += '<circle cx="60" cy="56" r="30" fill="' + HAIR + '"/><ellipse cx="60" cy="62" rx="26" ry="27" fill="' + SKIN + '"/>';
-    if (conf.hair === 'short' || conf.hair === 'cap' || conf.hair === 'non') s += '<path d="M33 54 Q34 30 60 30 Q86 30 87 54 Q76 42 60 44 Q44 42 33 54 Z" fill="' + HAIR + '"/>';
-    else s += '<path d="M33 56 Q32 30 60 30 Q88 30 87 56 Q74 38 58 44 Q44 40 33 56 Z" fill="' + HAIR + '"/>';
+    if (conf.hair === 'long') s += '<path d="M28 56 Q22 108 40 112 L80 112 Q98 108 92 56 Z" fill="' + hc + '"/>';
+    if (conf.hair === 'bun') s += '<circle cx="60" cy="22" r="14" fill="' + hc + '"/>';
+    s += '<circle cx="60" cy="56" r="30" fill="' + hc + '"/><ellipse cx="60" cy="62" rx="26" ry="27" fill="' + SKIN + '"/>';
+    if (conf.hair === 'short' || conf.hair === 'cap' || conf.hair === 'non') s += '<path d="M33 54 Q34 30 60 30 Q86 30 87 54 Q76 42 60 44 Q44 42 33 54 Z" fill="' + hc + '"/>';
+    else s += '<path d="M33 56 Q32 30 60 30 Q88 30 87 56 Q74 38 58 44 Q44 40 33 56 Z" fill="' + hc + '"/>';
     if (conf.hair === 'cap') s += '<path d="M30 46 Q60 14 90 46 Z" fill="' + (conf.cap || '#34495e') + '"/><rect x="28" y="42" width="66" height="8" rx="4" fill="' + (conf.band || '#2c3e50') + '"/><circle cx="60" cy="34" r="5" fill="#ffd166"/>';
     if (conf.hair === 'non') s += '<path d="M14 50 L60 12 L106 50 Q60 60 14 50 Z" fill="#f2e2b0" stroke="#d9c38a" stroke-width="2"/><path d="M38 31 L60 12 L82 31" fill="none" stroke="#d9c38a" stroke-width="1.5"/>';
     if (conf.extra === 'apron') s += '<path d="M44 108 H76 L80 176 H40 Z" fill="#ffd6e0" stroke="#f2a7b8" stroke-width="2"/><path d="M48 100 Q60 112 72 100" fill="none" stroke="#f2a7b8" stroke-width="3"/>' +
       '<path d="M40 36 Q38 14 60 16 Q82 14 80 36 Z" fill="#fff" stroke="#e3e6f0" stroke-width="2"/><rect x="40" y="33" width="40" height="8" rx="3" fill="#fff" stroke="#e3e6f0" stroke-width="2"/>';
+    if (conf.extra === 'tapde') s += '<path d="M44 108 H76 L80 176 H40 Z" fill="#fff3c4" stroke="#e9c46a" stroke-width="2"/><path d="M48 100 Q60 112 72 100" fill="none" stroke="#e9c46a" stroke-width="3"/>';
     s += face(60, 62, 26);
-    if (conf.extra === 'glasses') s += '<g fill="none" stroke="#5a4a6a" stroke-width="2.5"><circle cx="50" cy="64" r="8"/><circle cx="70" cy="64" r="8"/><path d="M58 64 L62 64"/></g>';
+    if (conf.extra === 'beard') s += '<path d="M42 76 Q60 108 78 76 Q60 86 42 76 Z" fill="#f1f3f5"/><path d="M50 74 Q60 70 70 74" fill="none" stroke="#f1f3f5" stroke-width="4" stroke-linecap="round"/>';
+    if (conf.extra === 'glasses' || conf.glasses) s += '<g fill="none" stroke="#5a4a6a" stroke-width="2.5"><circle cx="50" cy="64" r="8"/><circle cx="70" cy="64" r="8"/><path d="M58 64 L62 64"/></g>';
     return s;
   }
 
@@ -382,6 +390,10 @@
     hint: '<path d="M16 3 A9 9 0 0 1 21 19 V22 H11 V19 A9 9 0 0 1 16 3Z" fill="#ffd166" stroke="#f4a261" stroke-width="1.5"/><rect x="11" y="23" width="10" height="3" rx="1.5" fill="#adb5bd"/><rect x="12" y="27" width="8" height="2.5" rx="1.2" fill="#adb5bd"/>',
     close: '<path d="M8 8 L24 24 M24 8 L8 24" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>',
     back: '<path d="M20 6 L10 16 L20 26" stroke="currentColor" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    fire: '<path d="M16 3 C19 9 25 12 25 19 A9 9 0 0 1 7 19 C7 14 11 12 12 8 C14 10 15 8 16 3Z" fill="#ff7043"/><path d="M16 14 C18 17 20 18 20 22 A4 4 0 0 1 12 22 C12 19 15 18 16 14Z" fill="#ffd166"/>',
+    water: '<path d="M16 3 C20 9 23 12 23 16 A7 7 0 0 1 9 16 C9 12 12 9 16 3Z" fill="#7fd0ee"/><path d="M3 24 Q7.5 20 12 24 T21 24 T30 24" fill="none" stroke="#1d8fbf" stroke-width="3" stroke-linecap="round"/>',
+    fish: '<path d="M3 22 Q8 18 13 22 T23 22 T31 22" fill="none" stroke="#48cae4" stroke-width="3" stroke-linecap="round"/><path d="M9 12 Q16 4 24 12 Q16 19 9 12Z M9 12 l-6 -5 v10Z" fill="#ff9f1c"/><circle cx="20" cy="11" r="1.6" fill="#2b2140"/>',
+    sos: '<path d="M9 4 h5 l2 6 -3 2 q2 5 7 7 l2 -3 6 2 v5 q-1 4 -5 4 Q8 26 5 9 q0 -5 4 -5Z" fill="#ef476f"/>',
     treat: '<path d="M6 12 Q16 2 26 12 L24 26 H8 Z" fill="#ffd6a5" stroke="#e9a35c" stroke-width="1.5"/><circle cx="12" cy="16" r="2" fill="#e76f51"/><circle cx="20" cy="18" r="2" fill="#e76f51"/>'
   };
   function icon(name, cls) { return svg('0 0 32 32', ICON[name] || '', cls || 'ico'); }
@@ -432,6 +444,15 @@
       label(0, 7, text, size || 24) + '</g>';
   }
 
+  /* Tên trường trên biển cổng (ba mẹ đổi được trong Góc ba mẹ). Tên dài thì chữ nhỏ lại cho vừa biển. */
+  function schoolText(x, y, size, maxW) {
+    var name = TT.store && TT.store.schoolName ? TT.store.schoolName() : 'Trường Tiểu học Tân Trường';
+    var fs = Math.max(10, Math.min(size, Math.floor(maxW / (name.length * 0.56))));
+    var fit = name.length * 0.56 * fs > maxW * 0.97 ? ' textLength="' + maxW + '" lengthAdjust="spacingAndGlyphs"' : '';
+    return '<text x="' + x + '" y="' + (y - (size - fs) * 0.35).toFixed(1) + '" text-anchor="middle" class="w-label gate-text" font-size="' + fs + '" fill="#fff"' + fit + '>' +
+      name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</text>';
+  }
+
   /* Chim nhỏ đậu: chạm vào là hót. Khung ngoài giữ vị trí, khung trong dành cho chuyển động. */
   function bird(x, y, color, flip, cls) {
     return '<g class="bird ' + (cls || '') + '" data-hit="bird" transform="translate(' + x + ' ' + y + ')' + (flip ? ' scale(-1 1)' : '') + '"><g class="bird-fly"><g class="bird-in">' +
@@ -478,7 +499,7 @@
         '<rect x="1000" y="1228" width="70" height="20" rx="6" fill="#d4a373"/><rect x="1430" y="1228" width="70" height="20" rx="6" fill="#d4a373"/>' +
         '<path d="M1000 1214 Q1250 1120 1500 1214" fill="none" stroke="#ffd166" stroke-width="14" stroke-linecap="round"/>' +
         '<rect x="975" y="1196" width="550" height="78" rx="22" fill="#2a6f97" stroke="#fff" stroke-width="6"/>' +
-        '<text x="1250" y="1247" text-anchor="middle" class="w-label gate-text" font-size="34" fill="#fff">Trường Tiểu Học Tân Trường</text>' + '</g>' },
+        schoolText(1250, 1247, 34, 510) + '</g>' },
       { y: 1420, s: '<g id="booth" transform="translate(1640 1300)"><rect x="-70" y="0" width="140" height="120" rx="8" fill="#e0fbfc"/><path d="M-84 4 L0 -44 L84 4Z" fill="#3d5a80"/><rect x="-50" y="22" width="56" height="44" rx="6" fill="#98c1d9" stroke="#fff" stroke-width="4"/><rect x="18" y="40" width="38" height="80" rx="6" fill="#3d5a80"/>' + label(0, -14, 'Bảo vệ', 18, '#fff') + '</g>' }
     ];
   }
@@ -839,7 +860,7 @@
     for (i = 0; i < 5; i++) s += '<rect x="' + (2352 + i * 60) + '" y="548" width="16" height="74" rx="3" fill="#e9c46a"/>';
     s += '<rect x="2170" y="560" width="160" height="64" fill="#f3e2c0"/><rect x="2150" y="470" width="34" height="154" rx="6" fill="#e9c46a"/><rect x="2316" y="470" width="34" height="154" rx="6" fill="#e9c46a"/>' +
       '<path d="M2150 470 Q2250 410 2350 470" fill="none" stroke="#ffd166" stroke-width="12" stroke-linecap="round"/>' +
-      '<rect x="2076" y="418" width="348" height="54" rx="16" fill="#2a6f97" stroke="#fff" stroke-width="5"/><text x="2250" y="453" text-anchor="middle" class="w-label gate-text" font-size="22" fill="#fff">Trường Tiểu Học Tân Trường</text></g>';
+      '<rect x="2076" y="418" width="348" height="54" rx="16" fill="#2a6f97" stroke="#fff" stroke-width="5"/>' + schoolText(2250, 453, 22, 326) + '</g>';
     // Vỉa hè phía xa, mặt đường, vạch sang đường, vỉa hè phía gần
     s += '<rect y="620" width="2600" height="72" fill="url(#rdgach)"/><rect y="686" width="2600" height="8" fill="#b9b0a0"/>';
     s += '<rect y="692" width="2600" height="204" fill="#6b7280"/><path d="M0 702 H2600 M0 886 H2600" stroke="#fff" stroke-width="4" opacity=".8"/><path d="M0 794 H1880 M2080 794 H2600" stroke="#fff" stroke-width="6" stroke-dasharray="46 34"/>';
@@ -876,7 +897,7 @@
     classroomScene: classroomScene, classroomProps: classroomProps, ROOM: ROOM, DESKS: DESKS,
     svg: svg, girl: hero, kid: kid, adult: adult, pet: pet, PET_NAMES: PET_NAMES, PET_ACC: PET_ACC,
     obj: obj, OBJ: OBJ, CONTEXTS: CONTEXTS, DECOR: DECOR, decor: decor, icon: icon, ICON: ICON,
-    schoolScene: schoolScene, WORLD: WORLD, tree: tree, bush: bush, flowerBed: flowerBed,
+    schoolScene: schoolScene, WORLD: WORLD, tree: tree, bush: bush, flowerBed: flowerBed, palm: palm, skyBird: skyBird, butterfly: butterfly, windowRow: windowRow,
     girlSVG: function (o, cls) { return svg('0 0 120 200', hero(o), cls || 'char'); },
     kidSVG: function (n, i, cls) { return svg('0 0 120 200', kid(n, i), cls || 'char'); },
     adultSVG: function (k, cls) { return svg('0 0 120 220', adult(k), cls || 'char'); },

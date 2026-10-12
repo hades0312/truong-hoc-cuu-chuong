@@ -20,7 +20,8 @@
   function get(id) {
     var s = LIST.filter(function (x) { return x.id === id; })[0];
     if (!s || !TT.bank || !TT.bank[id]) return null;
-    return { id: s.id, name: s.name, icon: s.icon, teacher: s.teacher, tname: s.tname, topics: TT.bank[id].topics };
+    var custom = TT.store.schoolCustom(); // ba mẹ đã đổi tên trường: ẩn chủ đề chỉ đúng với trường mặc định
+    return { id: s.id, name: s.name, icon: s.icon, teacher: s.teacher, tname: s.tname, topics: TT.bank[id].topics.filter(function (t) { return !(custom && t.defaultSchool); }) };
   }
   function available() { return LIST.filter(function (s) { return !!(TT.bank && TT.bank[s.id]); }); }
 

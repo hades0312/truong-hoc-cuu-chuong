@@ -1,4 +1,4 @@
-/* world.js: các cảnh đi lại được — sân trường và bên trong lớp học.
+/* world.js: các cảnh đi lại được — nhà em, đường tới trường, sân trường và bên trong lớp học.
  * Máy tính: phím mũi tên/WASD, hoặc giữ chuột để bạn nhỏ đi theo con trỏ; Enter/Space để vào nơi đang đứng gần.
  * Màn hình cảm ứng: nút điều hướng + nút hành động, chạm để đi tới, kéo để xem bản đồ.
  * Có vật cản, tự tìm đường vòng và che khuất theo chiều sâu. */
@@ -24,7 +24,31 @@
 
   /* Đường tới trường: chỉ có một nơi để vào là cổng trường; còn lại là người và cảnh vật để trò chuyện */
   var ROAD_ZONES = [
-    { id: 'rd-gate', name: 'Vào trường', icon: 'classroom', mx: 2250, my: 540, tx: 2250, ty: 650, face: 'up' }
+    { id: 'rd-gate', name: 'Vào trường', icon: 'classroom', mx: 2250, my: 540, tx: 2250, ty: 650, face: 'up' },
+    { id: 'rd-home', name: 'Về nhà', icon: 'home', mx: 250, my: 1104, tx: 300, ty: 978, pill: true }
+  ];
+
+  /* Nhà em: mỗi nơi là một góc học kỹ năng sống (xem bank-home.js) */
+  var HOME_ZONES = [
+    { id: 'hm-song', name: 'Bờ sông', icon: 'water', mx: 478, my: 868, tx: 478, ty: 1010 },
+    { id: 'hm-ao', name: 'Ao cá', icon: 'fish', mx: 900, my: 690, tx: 900, ty: 782 },
+    { id: 'hm-vuon', name: 'Vườn rau', icon: 'garden', mx: 1485, my: 736, tx: 1485, ty: 866, face: 'up' },
+    { id: 'hm-hien', name: 'Hiên nhà', icon: 'home', mx: 2090, my: 556, tx: 2090, ty: 668, face: 'up' },
+    { id: 'hm-bep', name: 'Gian bếp', icon: 'fire', mx: 2452, my: 556, tx: 2452, ty: 668, face: 'up' },
+    { id: 'hm-chuong', name: 'Chuồng trại', icon: 'pets', mx: 2736, my: 566, tx: 2736, ty: 682, face: 'up' },
+    { id: 'hm-gate', name: 'Đi học', icon: 'walk', mx: 3098, my: 1100, tx: 3092, ty: 1016, pill: true }
+  ];
+  var HOME_NPCS = [
+    { id: 'ong', name: 'Ông', kind: 'adult', art: 'ong', x: 1450, y: 985 },
+    { id: 'ba', name: 'Bà', kind: 'adult', art: 'ba', x: 1950, y: 676 },
+    { id: 'me', name: 'Mẹ', kind: 'adult', art: 'me', x: 2330, y: 702 },
+    { id: 'bo', name: 'Bố', kind: 'adult', art: 'bo', x: 610, y: 1080 }
+  ];
+  /* Chỗ nguy hiểm: bé lại gần thì được nhắc (mỗi chỗ nhắc lại sau ít nhất nửa phút) */
+  var HOME_WARNS = [
+    { r: [380, 640, 520, 1220], text: 'Sông sâu và nước chảy xiết! Mình không lại gần mép nước khi không có người lớn.' },
+    { r: [612, 772, 1188, 1092], text: 'Ao sâu lắm! Mình không chơi sát mép ao, đồ rơi xuống thì gọi người lớn lấy giúp.' },
+    { r: [1508, 1086, 1692, 1206], text: 'Giếng sâu! Mình không cúi nhìn xuống, không trèo lên thành giếng.' }
   ];
   var ROAD_NPCS = [
     { id: 'congan', name: 'Chú Cảnh sát', kind: 'adult', art: 'congan', x: 1790, y: 958 },
@@ -76,13 +100,27 @@
         [870, 1380, 992, 1421], [1508, 1380, 1632, 1421], [1568, 1296, 1712, 1402], // bồn hoa cổng, chòi bảo vệ
         [1050, 1190, 1160, 1222]                                                    // bảng sơ đồ trường
       ],
-      label: 'Sân Trường Tiểu Học Tân Trường. Dùng phím mũi tên để đi, Enter để vào nơi đang đứng gần.'
+      label: function () { return 'Sân ' + TT.store.schoolName() + '. Dùng phím mũi tên để đi, Enter để vào nơi đang đứng gần.'; }
     },
     road: {
       w: 2600, h: 1200, walk: { x0: 80, x1: 2520, y0: 632, y1: 985 }, start: { x: 470, y: 950 },
       speed: 440, camDy: 130, bg: '#bfe8a0', top: '#8fd3ff', step: 'step', zones: ROAD_ZONES, depth: true, flock: [],
       blocks: [[-200, 692, 1900, 895], [2060, 692, 2800, 895]], // mặt đường: chỉ sang được ở vạch kẻ
       label: 'Đường tới trường. Đi dọc vỉa hè tới vạch sang đường, chờ đèn xanh cho người đi bộ rồi sang đường vào cổng trường.'
+    },
+    home: {
+      w: 3200, h: 1300, walk: { x0: 410, x1: 3150, y0: 652, y1: 1212 }, start: { x: 2990, y: 1012 },
+      speed: 450, camDy: 130, bg: '#bfe8a0', top: '#8fd3ff', step: 'step', zones: HOME_ZONES, depth: true, flock: [[2250, 1040], [1880, 1010], [1120, 1120]], warns: HOME_WARNS,
+      ovals: [[900, 934, 264, 132]],                                             // ao cá: [tâm x, tâm y, bán kính ngang, bán kính dọc]
+      blocks: [
+        [1262, 684, 1710, 830],                                                  // luống rau
+        [538, 704, 582, 726], [1268, 984, 1312, 1008], [1618, 889, 1662, 913], [1746, 1136, 1774, 1156], // cây bóng mát, chuối, bưởi, cau
+        [1542, 1108, 1658, 1170], [1788, 656, 1856, 714],                         // giếng, chum nước
+        [2036, 712, 2254, 796], [2292, 934, 2352, 968],                           // thóc phơi, chó Vàng
+        [2940, 768, 3080, 826], [2626, 1120, 2776, 1158],                         // cây rơm, con bò
+        [3125, 640, 3260, 968], [3125, 1060, 3260, 1230]                          // hàng rào hai bên cổng
+      ],
+      label: 'Nhà em ở làng quê. Dùng phím mũi tên để đi tới bờ sông, ao cá, vườn rau, hiên nhà, gian bếp, chuồng trại; Enter để vào nơi đang đứng gần.'
     },
     classroom: {
       w: 1600, h: 1000, walk: { x0: 70, x1: 1530, y0: 470, y1: 975 }, start: { x: 1450, y: 500 },
@@ -174,6 +212,26 @@
     return { ground: A.roadScene(), actors: list, npcs: ROAD_NPCS };
   }
 
+  function homeContent(p) {
+    var list = A.homeProps().map(function (o) { return { y: o.y, s: wrap(o.y, 'prop', o.poke ? ' data-hit="poke" data-id="' + o.poke + '"' : '', o.s) }; });
+    HOME_NPCS.forEach(function (n) { list.push({ y: n.y, s: npcSvg(n, p) }); });
+    var colors = ['#ffb703', '#ff8fab', '#95d5b2'];
+    SCENES.home.flock.forEach(function (f, i) {
+      list.push({ y: f[1], s: wrap(f[1], 'gbird', ' data-i="' + i + '"', A.bird(f[0], f[1], colors[i % colors.length], i % 2 === 1, i % 2 ? 'b2' : '')) });
+    });
+    st.warnIn = []; st.warnAt = [];
+    return { ground: A.homeScene(), actors: list, npcs: HOME_NPCS };
+  }
+  /* Nhắc bé khi vừa bước vào vùng nguy hiểm (mép sông, mép ao, giếng) */
+  function warnUpdate(now) {
+    var p = st.player, ws = st.sc.warns;
+    for (var i = 0; i < ws.length; i++) {
+      var r = ws[i].r, inside = p.x > r[0] && p.x < r[2] && p.y > r[1] && p.y < r[3];
+      if (inside && !st.warnIn[i] && now - (st.warnAt[i] || -1e9) > 30000) { st.warnAt[i] = now; TT.audio.play('soft'); bubble(ws[i].text); }
+      st.warnIn[i] = inside;
+    }
+  }
+
   /* Xe cộ và đèn giao thông trên đường tới trường. Xe luôn dừng trước vạch khi đèn của xe không xanh
    * hoặc khi bé còn ở trên vạch sang đường, nên không bao giờ có va chạm. */
   function roadUpdate(dt) {
@@ -240,7 +298,36 @@
     tre: { lines: ['Luỹ tre làng xanh mát quanh năm.'] },
     bienbao: { lines: ['Biển báo "Trẻ em": gần đây có trường học, xe cộ phải đi chậm lại.', 'Biển hình tam giác viền đỏ là biển báo nguy hiểm.'] },
     xebuyt: { lines: ['Trạm xe buýt đây. Chờ xe dừng hẳn rồi mới lên, xuống và nhớ xếp hàng nhé!', 'Trên xe buýt mình ngồi ngay ngắn, không thò đầu, thò tay ra ngoài.'] },
-    nha: { lines: ['Con chào bố mẹ, con đi học ạ!', 'Đi học về, mình nhớ chào ông bà, bố mẹ nhé.'] },
+    nha: { lines: ['Con chào bố mẹ, con đi học ạ!', 'Đi học về, mình nhớ chào ông bà, bố mẹ nhé.', 'Chạm vào nút "Về nhà" để vào thăm ông bà, bố mẹ.'] },
+    // ----- Nhà em -----
+    song: { sfx: 'splash', lines: ['Con sông quê mát lành, nhưng sông sâu và nước chảy xiết. Mình chỉ đứng xa mà ngắm thôi.', 'Không tắm sông, tắm ao khi không có người lớn biết bơi đi cùng nhé!', 'Mùa mưa lũ, nước sông dâng cao và chảy rất mạnh. Tuyệt đối không lại gần.'] },
+    bennuoc: { lines: ['Bến nước để người lớn giặt giũ, lấy nước tưới rau. Ván gỗ trơn lắm, mình không ra đó một mình.'] },
+    thuyen: { lines: ['Chiếc thuyền của bố. Đi thuyền thì ai cũng phải mặc áo phao.', 'Trên thuyền mình ngồi yên, không đùa nghịch, không thò tay xuống nước.'] },
+    phao: { lines: ['Phao cứu sinh và áo phao luôn treo sẵn ở bến nước.', 'Thấy người bị đuối nước: hô to gọi người lớn, ném phao hoặc đưa sào dài cho bám. Mình không tự nhảy xuống cứu.'] },
+    biensong: { lines: ['Biển báo: sông sâu, nguy hiểm. Mình không chơi gần mép nước.'] },
+    bienao: { lines: ['Biển báo: ao sâu, nguy hiểm. Mình không chơi sát mép ao.'] },
+    ao: { sfx: 'splash', lines: ['Ao nhà mình nuôi cá trắm, cá chép, cá rô phi.', 'Ao sâu hơn mình tưởng đấy. Không với tay vớt đồ rơi xuống ao, hãy gọi người lớn.', 'Bèo và sen che mặt nước nên càng khó biết chỗ nào sâu.'] },
+    vit: { sfx: 'quack', lines: ['Cạp cạp! Chân vịt có màng nên vịt bơi rất giỏi.', 'Vịt đẻ trứng. Trứng vịt phải nấu chín rồi mới ăn.'] },
+    rau: { lines: ['Luống rau cải, cà rốt, su hào ông trồng. Rau nhà trồng vừa sạch vừa ngon.', 'Rau cần đất, nước, ánh sáng và không khí để lớn.', 'Mình đi theo lối, không giẫm lên luống rau nhé.'] },
+    chuoi: { lines: ['Cây chuối sai quả quá! Chuối chín có nhiều vi-ta-min và chất khoáng.', 'Mỗi cây chuối chỉ ra một buồng quả thôi đấy.'] },
+    buoi: { lines: ['Cây bưởi nhà mình. Bưởi có nhiều vi-ta-min C.', 'Hoa bưởi màu trắng, nở vào mùa xuân, thơm ngát cả vườn.'] },
+    cau: { lines: ['Cây cau trước ngõ, thân cao và thẳng tắp.'] },
+    gieng: { lines: ['Giếng nước sâu lắm! Không cúi người nhìn xuống, không trèo lên thành giếng.', 'Giếng luôn được đậy nắp để giữ nước sạch và không ai bị ngã.'] },
+    chum: { lines: ['Chum nước mưa luôn đậy nắp kín để muỗi không vào đẻ trứng.', 'Muỗi vằn truyền bệnh sốt xuất huyết. Không để nước đọng quanh nhà nhé.'] },
+    thoc: { lines: ['Thóc đang phơi trên sân. Phơi thật khô thì mới cất được lâu.', 'Mình đi vòng, không giẫm lên thóc nhé.'] },
+    nhaminh: { lines: ['Nhà mình đây! Đi đâu về mình cũng chào ông bà, bố mẹ.', 'Ra khỏi nhà mình nhớ xin phép và nói rõ đi đâu, đi với ai.'] },
+    odien: { lines: ['Cầu dao điện. Không chạm vào ổ điện, dây điện khi tay ướt.', 'Không chọc que, đinh hay ngón tay vào ổ điện. Điện giật rất nguy hiểm!', 'Thấy dây điện đứt rơi xuống đất: tránh thật xa và báo người lớn.'] },
+    bep: { lines: ['Bếp đang nấu cơm. Bếp nóng và có lửa: trẻ em không tự ý bật bếp.', 'Nấu xong phải tắt bếp, khoá van ga. Không để giấy, vải, xăng dầu gần bếp.', 'Ngửi thấy mùi ga: không bật công tắc điện, không bật lửa. Mở cửa cho thoáng và báo ngay người lớn.'] },
+    binhcc: { lines: ['Bình chữa cháy để người lớn dập đám cháy khi lửa còn nhỏ.', 'Có cháy: chạy ra chỗ an toàn, hô to "Cháy! Cháy!" và gọi 114.'] },
+    meo: { sfx: 'meow', lines: ['Meo meo! Mèo nhà mình đang sưởi nắng.', 'Mèo bắt chuột giỏi lắm. Mình vuốt nhẹ, không kéo đuôi mèo nhé.'] },
+    cho: { sfx: 'woof', lines: ['Gâu gâu! Chó Vàng trông nhà đấy.', 'Không trêu chó khi nó đang ăn hoặc đang ngủ.', 'Gặp chó lạ: đứng yên, không la hét, không chạy. Chờ nó đi rồi từ từ lùi ra xa.', 'Bị chó, mèo cắn hay cào: rửa vết thương bằng xà phòng dưới vòi nước 15 phút và báo ngay người lớn để đi tiêm phòng.'] },
+    ga: { sfx: 'cluck', lines: ['Cục ta cục tác! Gà mái vừa đẻ trứng.', 'Gà ăn thóc, ăn giun. Chạm vào gà vịt xong mình nhớ rửa tay bằng xà phòng.'] },
+    gatrong: { sfx: 'rooster', lines: ['Ò ó o! Gà trống gáy báo trời sáng.'] },
+    gacon: { sfx: 'bird', lines: ['Chiếp chiếp! Gà con theo mẹ đi kiếm mồi.', 'Gà mẹ ấp trứng khoảng 21 ngày thì gà con nở.'] },
+    chuongga: { sfx: 'cluck', lines: ['Chuồng gà có lưới chắn. Tối đến gà tự về chuồng ngủ.', 'Trong ổ có trứng kìa! Mình nhặt trứng nhẹ tay kẻo vỡ.'] },
+    lon: { sfx: 'oink', lines: ['Ụt ịt! Lợn đang đòi ăn.', 'Chuồng lợn được dọn sạch mỗi ngày để lợn khoẻ, không sinh bệnh.'] },
+    bo: { sfx: 'moo', lines: ['Con bò đang gặm cỏ. Bò là loài nhai lại.', 'Mình không đứng sát phía sau trâu bò, kẻo bị đá.'] },
+    rom: { lines: ['Cây rơm để dành cho trâu bò ăn và đun bếp.', 'Rơm khô bắt lửa rất nhanh. Tuyệt đối không nghịch lửa gần cây rơm!'] },
     den: { lines: [function () { return st && st.sim && PHASES[st.sim.pi].open ? 'Đèn cho người đi bộ đang xanh: mình được sang đường, đi trên vạch kẻ.' : 'Đèn cho người đi bộ đang đỏ: mình đứng chờ trên vỉa hè.'; }, 'Đèn đỏ dừng lại, đèn vàng đi chậm, đèn xanh mới được đi.'] }
   };
   function poke(el) {
@@ -283,11 +370,11 @@
       target: null, keys: {}, joy: { x: 0, y: 0 }, drag: null, follow: true, seated: null,
       raf: 0, last: 0, stepT: 0, nearT: 0, near: null, nearId: '', moving: false, sig: '', el: {}
     };
-    var content = key === 'classroom' ? roomContent(p) : (key === 'road' ? roadContent(p) : yardContent(p));
+    var content = key === 'classroom' ? roomContent(p) : (key === 'road' ? roadContent(p) : (key === 'home' ? homeContent(p) : yardContent(p)));
     st.npcs = content.npcs;
     container.innerHTML = '';
     container.style.background = sc.bg;
-    var vp = h('div', { class: 'viewport', id: 'viewport', tabindex: '0', 'aria-label': sc.label });
+    var vp = h('div', { class: 'viewport', id: 'viewport', tabindex: '0', 'aria-label': typeof sc.label === 'function' ? sc.label() : sc.label });
     var world = h('div', { class: 'world scene-' + key, 'data-light': 'go', style: 'width:' + sc.w + 'px;height:' + sc.h + 'px' });
     var divOn = p.settings.division;
 
@@ -454,6 +541,8 @@
     if (!m && g && x > g[0] && x < g[2] && y > g[1] && y < g[3]) return true; // cổng đang đóng (đèn đỏ ở vạch sang đường)
     m = m || 0;
     for (var i = 0; i < b.length; i++) { if (x > b[i][0] - m && x < b[i][2] + m && y > b[i][1] - m && y < b[i][3] + m) return true; }
+    var ov = st.sc.ovals; // vật cản hình bầu dục (ao cá)
+    for (i = 0; ov && i < ov.length; i++) { var ux = (x - ov[i][0]) / (ov[i][2] + m), uy = (y - ov[i][1]) / (ov[i][3] + m); if (ux * ux + uy * uy < 1) return true; }
     return false;
   }
   /* Bước một đoạn nhỏ; gặp vật cản thì trượt dọc theo cạnh (capX/capY: không trượt quá điểm đang nhắm tới).
@@ -638,6 +727,7 @@
       }
     }
     if (st.sim) roadUpdate(dt);
+    if (sc.warns) warnUpdate(now);
     setMoving(moved);
     if (moved) {
       st.stepT -= dt;
@@ -863,7 +953,7 @@
   function onKeyUp(e) { if (!st) return; var k = KEYMAP[e.key]; if (k) st.keys[k] = false; }
 
   TT.world = {
-    ZONES: ZONES, ROOM_ZONES: ROOM_ZONES, ROAD_ZONES: ROAD_ZONES, NPCS: NPCS, ROAD_NPCS: ROAD_NPCS, SCENES: SCENES, POKES: POKES,
+    ZONES: ZONES, ROOM_ZONES: ROOM_ZONES, ROAD_ZONES: ROAD_ZONES, HOME_ZONES: HOME_ZONES, HOME_NPCS: HOME_NPCS, NPCS: NPCS, ROAD_NPCS: ROAD_NPCS, SCENES: SCENES, POKES: POKES,
     build: build, destroy: destroy, goZone: goZone, walkTo: walkTo, greet: greet, say: bubble,
     relayout: function () { layout(true); },
     get state() { return st; }

@@ -1,7 +1,7 @@
 # Trường học cửu chương
 
-Game nhỏ cho các bạn tiểu học vừa chơi vừa học: luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia), học Toán, Khoa học, Tiếng Anh lớp 4 và kỹ năng sống (an toàn giao thông, ăn uống an toàn).
-Bé tự tạo nhân vật mang tên mình, đeo ba lô đi dọc đường làng, chờ đèn xanh sang đường, qua cổng trường, vào lớp, lên bảng, rồi học và luyện qua các trò chơi.
+Game nhỏ cho các bạn tiểu học vừa chơi vừa học: luyện bảng cửu chương (bảng nhân 2–9, có thể bật thêm phép chia), học Toán, Khoa học, Tiếng Anh lớp 4 và kỹ năng sống (an toàn giao thông, ăn uống an toàn, phòng cháy chữa cháy, phòng đuối nước, an toàn ở nhà).
+Bé tự tạo nhân vật mang tên mình, chào ông bà bố mẹ ở nhà, đeo ba lô đi dọc đường làng, chờ đèn xanh sang đường, qua cổng trường, vào lớp, lên bảng, rồi học và luyện qua các trò chơi.
 
 **Chơi ngay: <https://congai.lamphong.info>**
 
@@ -23,9 +23,34 @@ Game chỉ là các file tĩnh (HTML, CSS, JavaScript), không có máy chủ ph
 
 Ngoài ra còn có thư viện ghép thẻ, bảng tin với nhiệm vụ mỗi ngày, và phần "Ôn lại" tự chọn những phép tính bé hay sai.
 
+### Nhà em ở làng quê
+
+Mỗi lần vào chơi, bé bắt đầu ở nhà: chào ông bà, bố mẹ rồi chạm **Đi học** ở cổng nhà để ra đường tới trường (ai vội thì bấm "Vào trường" ở thanh Đi nhanh). Ngôi nhà của bé có ông bà, bố mẹ, sân gạch phơi thóc, vườn rau, ao cá, chuồng gà, chuồng lợn, con bò, chó mèo và một khúc sông chảy qua. Mỗi nơi là một góc học để bé biết tự giữ an toàn:
+
+| Nơi | Bé học gì | Ai dạy |
+| --- | --- | --- |
+| **Gian bếp** | Phòng cháy chữa cháy (26 câu), bảng "Khi có cháy, con nhớ", bảng số khẩn cấp 111, 113, 114, 115 | Mẹ |
+| **Bờ sông, ao cá** | Phòng tránh đuối nước (19 câu), mưa bão và sấm sét (15 câu) | Bố |
+| **Hiên nhà** | An toàn ở nhà: điện, thuốc, vật sắc nhọn, người lạ, chó cắn… (25 câu); gia đình em: xưng hô, lễ phép, việc nhà (16 câu) | Bà, ông |
+| **Chuồng trại** | Vật nuôi trong nhà: gia cầm, gia súc, cách chăm và giữ vệ sinh (19 câu) | Bà |
+| **Vườn rau** | Vườn nhà, đồng quê: cây trồng, mùa màng (18 câu) | Ông |
+
+![Nhà em](screenshots/29-nha-em.png)
+
+- **Cảnh báo nguy hiểm:** bé không lội xuống ao, xuống sông được. Lại gần mép sông, mép ao hay giếng thì bé được nhắc ngay vì sao chỗ đó nguy hiểm.
+- **Chạm vào cảnh vật:** hơn 30 thứ có lời nói riêng, như bếp, bình chữa cháy, cầu dao điện, giếng, chum nước, cây rơm, con chó, gà vịt, phao cứu sinh, chiếc thuyền… Con vật có tiếng kêu.
+- **Việc nhà vừa sức:** cho gà vịt ăn giúp bà, tưới rau giúp ông; mỗi việc được thưởng một ngôi sao một lần mỗi ngày.
+
+| | |
+| --- | --- |
+| ![Cảnh báo ao sâu](screenshots/30-ao-ca-canh-bao.png) **Ao cá:** lại gần mép ao là được nhắc. | ![Phòng tránh đuối nước](screenshots/34-phong-duoi-nuoc.png) **Bờ sông:** bố dạy phòng tránh đuối nước. |
+| ![Khi có cháy](screenshots/32-khi-co-chay.png) **Gian bếp:** sáu điều cần nhớ khi có cháy, có nghe đọc. | ![Số khẩn cấp](screenshots/33-so-khan-cap.png) **Số khẩn cấp:** gọi số nào, khi nào, nói gì. |
+
+Câu hỏi soạn theo các khuyến cáo phổ biến cho học sinh tiểu học, chưa qua thầy cô hay cơ quan chuyên môn thẩm định. Ba mẹ thấy câu nào chưa hợp thì sửa trong `js/bank-home.js`.
+
 ### Đường tới trường
 
-Trước khi vào trường, bé đi từ nhà dọc con đường làng: núi xa, đồng lúa, con trâu, đàn cò, làng xóm, rồi tới đoạn đường có xe cộ và đèn giao thông trước cổng trường.
+Từ cổng nhà, bé đi dọc con đường làng: núi xa, đồng lúa, con trâu, đàn cò, làng xóm, rồi tới đoạn đường có xe cộ và đèn giao thông trước cổng trường.
 
 ![Đường tới trường](screenshots/23-duong-toi-truong.png)
 
@@ -36,6 +61,7 @@ Trước khi vào trường, bé đi từ nhà dọc con đường làng: núi x
 - **Đèn giao thông:** đèn cho người đi bộ đỏ thì bé không bước xuống đường được và được nhắc đứng chờ. Đèn xanh thì sang đường trên vạch kẻ. Xe cộ luôn dừng trước vạch khi bé còn ở trên đường. Sang đường đúng luật lần đầu mỗi ngày được thưởng một ngôi sao.
 - **Chú Cảnh sát** dạy an toàn giao thông (22 câu), **bác nông dân** kể chuyện đồng ruộng.
 - Từ sân trường có thể **ra đường** lại qua cổng; ai vội thì bấm "Vào trường" ở thanh Đi nhanh.
+- Chạm **Về nhà** ở ngôi nhà đầu đường để quay lại cảnh "Nhà em".
 
 ### Tham quan trường
 
@@ -55,7 +81,7 @@ Ngôi trường trong game được vẽ theo tưởng tượng. Phần quê hư
 
 | | |
 | --- | --- |
-| ![Tô màu nhân vật](screenshots/26-to-mau-nhan-vat.png) **Tô màu nhân vật:** nhìn từ trước và từ sau lưng, đổi màu là thấy ngay. | ![Hướng dẫn chơi](screenshots/27-huong-dan-choi.png) **Hướng dẫn chơi:** chín mục ngắn cho bé tự đọc hoặc nghe đọc. |
+| ![Tô màu nhân vật](screenshots/26-to-mau-nhan-vat.png) **Tô màu nhân vật:** nhìn từ trước và từ sau lưng, đổi màu là thấy ngay. | ![Hướng dẫn chơi](screenshots/27-huong-dan-choi.png) **Hướng dẫn chơi:** mười mục ngắn cho bé tự đọc hoặc nghe đọc. |
 
 ### Các môn học lớp 4
 
@@ -67,6 +93,7 @@ Bấm **Bảng lớp** trong lớp học hoặc nút **Môn học** ở thanh Đ
 | --- | --- |
 | **Toán lớp 4** (cô Hằng) | 8 chủ đề: số có nhiều chữ số, cộng trừ số lớn, nhân chia, trung bình cộng và tổng–hiệu, phân số, đo lường, hình học, biểu thức và tìm số chưa biết. Đề sinh ngẫu nhiên nên làm mãi không trùng. |
 | **Khoa học** (thầy Nam) | 146 câu, 8 chủ đề: nước, không khí, ánh sáng và âm thanh, nhiệt, thực vật và động vật, nấm, dinh dưỡng và sức khoẻ, chuỗi thức ăn. |
+| **Kỹ năng sống** | 194 câu, 10 chủ đề: an toàn giao thông, ăn uống an toàn, trường em quê em, và 7 chủ đề học ở cảnh "Nhà em". |
 | **Tiếng Anh** (cô Lan) | 218 câu, 12 chủ đề theo sách Global Success 4, có máy đọc tiếng Anh và câu nghe (cần thiết bị có giọng đọc tiếng Anh). |
 
 Mỗi lượt 6 câu trắc nghiệm. Sai lần đầu có gợi ý, sai lần hai được chỉ đáp án kèm giải thích, và câu đó sẽ được hỏi lại. Câu mới và câu từng sai được ưu tiên ở các lượt sau.
@@ -115,6 +142,9 @@ Lưu ý:
 
 ![Góc ba mẹ](screenshots/14-goc-ba-me.png)
 
+![Cổng trường mang tên ba mẹ đặt](screenshots/36-cong-truong-ten-moi.png)
+
+- **Đổi tên trường:** trong Góc ba mẹ có ô "Tên trường của con". Ba mẹ gõ tên trường con đang học, biển trên cổng trường và lời cô giáo trong chuyến tham quan sẽ dùng tên đó. Khi dùng tên riêng, phần "Trường em, quê em" (kể về xã Trường Lâm) được ẩn đi.
 - **Góc ba mẹ** (nhấn giữ nút 2 giây để vào): xem bé đã vững phép tính nào, cần ôn phép nào; chọn bảng muốn luyện, thời lượng mỗi lượt, bật phép chia, tắt nhạc nền; xóa tiến độ hoặc xóa nhân vật.
 - **Tiến độ lưu ngay trên máy của bé** (localStorage), riêng cho từng nhân vật. Vì vậy chơi trên máy khác sẽ bắt đầu lại, và xóa dữ liệu trình duyệt thì mất tiến độ.
 - Game tự nhắc nghỉ khi bé chơi đủ thời lượng ba mẹ đặt.
@@ -139,10 +169,11 @@ Tên trong bản này là tên các bạn cùng lớp của con mình. Để đ�
 | Bạn nào là nam (để vẽ đúng hình) | Danh sách `BOYS` trong `js/art.js`; ai không có trong đó sẽ vẽ hình bạn nữ |
 | Hai nhân vật có sẵn | `CHARACTERS` trong `js/storage.js` |
 | Tên cô giáo | Tìm và thay chữ `Hằng` trong các file ở `js/` |
-| Câu hỏi Khoa học, Tiếng Anh, Kỹ năng sống | Thêm, sửa các câu trong `js/bank-science.js`, `js/bank-english.js`, `js/bank-life.js` (mỗi câu gồm câu hỏi `q`, đáp án đúng `a`, các đáp án sai `wrong`, lời giải thích `why`) |
+| Câu hỏi Khoa học, Tiếng Anh, Kỹ năng sống | Thêm, sửa các câu trong `js/bank-science.js`, `js/bank-english.js`, `js/bank-life.js`, `js/bank-home.js` (mỗi câu gồm câu hỏi `q`, đáp án đúng `a`, các đáp án sai `wrong`, lời giải thích `why`) |
 | Thầy cô, chú bảo vệ ngoài sân | Danh sách `NPCS` trong `js/world.js`; lời thoại ở `npcLines` trong `js/activities.js` |
 | Chuyến tham quan, phần quê hương | `STOPS`, `HOME`, `SCHOOL` trong `js/tour.js` |
-| Tên trường trên cổng | Tìm `Tân Trường` trong `js/art.js`, `js/world.js`, `manifest.webmanifest` |
+| Tên trường trên cổng | Không cần sửa mã: đổi trong Góc ba mẹ. Tên mặc định là `DEFAULT_SCHOOL` trong `js/storage.js` |
+| Ông bà, bố mẹ ở nhà | Danh sách `HOME_NPCS` trong `js/world.js`; lời thoại ở `npcLines` trong `js/activities.js` |
 | Biển tên các lớp | Tìm `Lớp 4E` trong `js/art.js` |
 
 Mỗi ngày game chọn ngẫu nhiên 4 bạn đứng ngoài sân và 10 bạn ngồi trong lớp từ danh sách, nên danh sách cần ít nhất 15 tên.
@@ -156,7 +187,7 @@ Game chỉ gồm file tĩnh nên đặt ở đâu cũng được, miễn là có
 
 Hai việc cần nhớ khi tự đăng:
 
-- **Mỗi lần sửa file, tăng số phiên bản ở hai chỗ:** `CACHE` ở đầu `sw.js` (ví dụ `tientien-v11` → `tientien-v12`) và số `?v=` trong `index.html` (tìm `?v=11`, thay tất cả thành `?v=12`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
+- **Mỗi lần sửa file, tăng số phiên bản ở hai chỗ:** `CACHE` ở đầu `sw.js` (ví dụ `tientien-v12` → `tientien-v13`) và số `?v=` trong `index.html` (tìm `?v=12`, thay tất cả thành `?v=13`). Nếu không, máy đã mở game trước đó vẫn chạy bản cũ.
 - **Game tự cập nhật:** vì game được lưu sẵn trong máy để chơi offline, mỗi lần mở lại (và mỗi 30 phút khi đang mở) trang sẽ hỏi máy chủ xem có bản mới. Có bản mới thì game tự tải lại ở màn hình cổng trường; nếu bé đang chơi dở, game chờ tới khi bé về cổng trường rồi mới cập nhật, tiến độ không mất.
 - Đổi tên miền trong các thẻ `og:url` và `og:image` ở đầu `index.html` thành địa chỉ của bạn, để link chia sẻ lên mạng xã hội hiện đúng ảnh.
 
@@ -168,12 +199,14 @@ Không dùng thư viện ngoài, không cần bước build. Hình vẽ là SVG 
 - `js/engine.js` — toán, theo dõi từng phép tính, lập lịch ôn tập (Leitner), giải thích từng bước
 - `js/storage.js` — hồ sơ riêng cho từng nhân vật (hai bạn có sẵn và các nhân vật bé tự tạo, tối đa 8), danh sách bạn cùng lớp
 - `js/art.js` — toàn bộ hình vẽ: sân trường, lớp học, nhân vật nhìn từ trước và sau, thú, chim, đồ vật
-- `js/audio.js` — hiệu ứng, tiếng chim và âm thanh nền theo cảnh, giọng đọc tiếng Việt
-- `js/world.js` — các cảnh đi lại được (đường tới trường, sân trường, lớp học): bàn phím, chuột, nút điều hướng, vật cản, tìm đường, xe cộ và đèn giao thông, cảnh vật chạm vào được
+- `js/art-home.js` — hình vẽ cảnh "Nhà em": bờ sông, ao cá, vườn rau, nhà và gian bếp, chuồng trại, vật nuôi
+- `js/audio.js` — hiệu ứng, tiếng chim, tiếng vật nuôi và âm thanh nền theo cảnh, giọng đọc tiếng Việt
+- `js/world.js` — các cảnh đi lại được (nhà em, đường tới trường, sân trường, lớp học): bàn phím, chuột, nút điều hướng, vật cản, tìm đường, xe cộ và đèn giao thông, nhắc khi tới gần chỗ nguy hiểm, cảnh vật chạm vào được
 - `js/quiz.js` — bộ chạy nhiệm vụ, gợi ý hai mức, hỏi lại câu sai
 - `js/tour.js` — nội dung chuyến tham quan trường và phần quê hương em
 - `js/subjects.js` — các môn học lớp 4: chọn câu, chạy lượt trắc nghiệm, ghi tiến độ
 - `js/bank-math.js`, `js/bank-science.js`, `js/bank-english.js`, `js/bank-life.js` — ngân hàng câu hỏi Toán (sinh đề ngẫu nhiên), Khoa học, Tiếng Anh, Kỹ năng sống (an toàn giao thông, ăn uống an toàn)
+- `js/bank-home.js` — Kỹ năng sống ở nhà: phòng cháy chữa cháy, phòng đuối nước, an toàn ở nhà, vật nuôi, vườn nhà, gia đình em, mưa bão sấm sét
 - `js/activities.js` — bảng lớp, thư viện, bảng tin, tô màu nhân vật, trang trí đảo, thú cưng, hướng dẫn chơi, lời thoại
 - `js/visual.js` — hình nhóm đồ vật và bảng chấm
 - `js/install.js` — nút "Cài app" cho từng loại thiết bị

@@ -1,7 +1,7 @@
 {
   "name": "Trường học cửu chương",
   "short_name": "Cửu chương",
-  "description": "Học bảng cửu chương bằng hình ảnh tại Trường Tiểu Học Tân Trường tưởng tượng.",
+  "description": "Vừa chơi vừa học: bảng cửu chương, Toán, Khoa học, Tiếng Anh lớp 4 và kỹ năng sống.",
   "lang": "vi",
   "start_url": "./index.html",
   "scope": "./",

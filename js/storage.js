@@ -17,6 +17,8 @@
     huyen: { id: 'huyen', name: 'Khánh Huyền', hair: 2, bag: '#7cc6fe', acc: 2, pet: 'bong' }
   };
   var MAX_CUSTOM = 8;
+  /* Tên trường trên cổng. Ba mẹ đổi được trong Góc ba mẹ; tên dùng chung cho mọi nhân vật trên máy này. */
+  var DEFAULT_SCHOOL = 'Trường Tiểu học Tân Trường';
 
   function memoryStore() {
     var m = {};
@@ -151,6 +153,12 @@
     save();
   }
 
+  /* Tên trường: bỏ ký tự lạ, tối đa 40 chữ */
+  function cleanSchool(s) { return String(s || '').replace(/[<>&"'`\\\/]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40); }
+  function schoolName() { return cleanSchool(data.school) || DEFAULT_SCHOOL; }
+  function schoolCustom() { return schoolName() !== DEFAULT_SCHOOL; }
+  function setSchool(name) { data.school = cleanSchool(name); if (data.school === DEFAULT_SCHOOL) data.school = ''; save(); }
+
   function today(p) {
     var k = TT.engine.dayKey(Date.now());
     if (!p.daily[k]) {
@@ -161,7 +169,8 @@
   }
 
   TT.store = {
-    CHARACTERS: CHARACTERS, CLASSMATES: CLASSMATES, MAX_CUSTOM: MAX_CUSTOM,
+    CHARACTERS: CHARACTERS, CLASSMATES: CLASSMATES, MAX_CUSTOM: MAX_CUSTOM, DEFAULT_SCHOOL: DEFAULT_SCHOOL,
+    schoolName: schoolName, schoolCustom: schoolCustom, setSchool: setSchool,
     list: list, customIds: customIds, nameOf: nameOf, nameTaken: nameTaken, cleanName: cleanName, matesOf: matesOf,
     newId: newId, addProfile: addProfile, removeProfile: removeProfile,
     get data() { return data; },

@@ -159,6 +159,27 @@
     set.appendChild(toggle('Giảm chuyển động', p.settings.reducedMotion, function (v) { p.settings.reducedMotion = v; TT.store.save(); opts.onChange && opts.onChange(); }));
     wrap.appendChild(set);
 
+    // ---- Tên trường trên cổng (dùng chung cho mọi nhân vật trên máy này) ----
+    var S = TT.store;
+    var schoolIn = h('input', { id: 'school-name', type: 'text', maxlength: '40', value: S.schoolName(), autocomplete: 'off', autocapitalize: 'words', placeholder: S.DEFAULT_SCHOOL, 'aria-describedby': 'school-help' });
+    var saveSchool = function (name) {
+      S.setSchool(name);
+      TT.world.destroy(); // dựng lại cảnh để biển cổng hiện tên mới
+      opts.onChange && opts.onChange();
+      U.toast(S.schoolCustom() ? 'Đã đổi tên trường thành “' + S.schoolName() + '”.' : 'Đã dùng lại tên trường mặc định.');
+      render(container, opts);
+    };
+    schoolIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') saveSchool(schoolIn.value); });
+    var schoolRow = h('div', { class: 'row-actions wrap left' }, [btn('Lưu tên trường', 'primary', function () { saveSchool(schoolIn.value); }, { id: 'btn-school-save' })]);
+    if (S.schoolCustom()) schoolRow.appendChild(btn('Dùng tên mặc định', 'ghost', function () { saveSchool(''); }, { id: 'btn-school-reset' }));
+    wrap.appendChild(h('section', { class: 'p-card' }, [
+      h('h2', { text: 'Tên trường của con' }),
+      h('label', { class: 'field' }, [h('span', { text: 'Tên hiện trên cổng trường' }), schoolIn,
+        h('small', { id: 'school-help', text: 'Ba mẹ gõ tên trường con đang học (tối đa 40 chữ) để game gần gũi hơn. Tên này dùng cho mọi nhân vật trên máy này.' })]),
+      schoolRow,
+      S.schoolCustom() ? h('p', { class: 'muted small', text: 'Khi dùng tên trường riêng, phần “Trường em, quê em” (kể về xã Trường Lâm, Thanh Hoá) trong chuyến tham quan và bộ câu đố đi kèm được ẩn đi, vì chỉ đúng với trường mặc định.' }) : null
+    ]));
+
     // ---- Cài ra màn hình chính ----
     var isApp = TT.install.installed();
     wrap.appendChild(h('section', { class: 'p-card' }, [

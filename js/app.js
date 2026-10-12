@@ -13,7 +13,7 @@
     rewarded: {},
     npcTalk: {},
     parentBack: 'title',
-    scene: 'yard'            // cảnh đang đi lại: 'yard' (sân trường) hoặc 'classroom' (trong lớp)
+    scene: 'yard'            // cảnh đang đi lại: 'home' (nhà em), 'road' (đường tới trường), 'yard' (sân trường), 'classroom' (trong lớp)
   };
   TT.app = app;
 
@@ -58,7 +58,7 @@
   }
 
   function charName(id) { return S.nameOf(id || S.data.active); }
-  function backLabel() { return app.scene === 'classroom' ? 'Về lớp học' : 'Về sân trường'; }
+  function backLabel() { return { classroom: 'Về lớp học', road: 'Ra đường', home: 'Về sân nhà' }[app.scene] || 'Về sân trường'; }
 
   /* ---------------- Màn hình đầu: cổng trường ---------------- */
   function renderTitle() {
@@ -110,7 +110,7 @@
     card.appendChild(picks);
     if (many && selBtn) setTimeout(function () { picks.scrollLeft = selBtn.offsetLeft - (picks.clientWidth - selBtn.offsetWidth) / 2; }, 0);
     var actions = h('div', { class: 'title-actions' });
-    actions.appendChild(btn('Vào trường', 'primary big', function () { enterAs(app.selected); }, { id: 'btn-enter' }));
+    actions.appendChild(btn('Vào chơi', 'primary big', function () { enterAs(app.selected); }, { id: 'btn-enter' }));
     if (data.active && S.hasProgress(data.active)) {
       actions.appendChild(btn('Tiếp tục chơi (' + charName(data.active) + ')', 'secondary big', function () { enterAs(data.active); }, { id: 'btn-continue' }));
     }
@@ -123,9 +123,9 @@
     S.setActive(id);
     var p = S.profile();
     applyProfileSettings();
-    app.viaRoad = true; // vào từ cổng game: đi qua đường tới trường trước
+    app.viaRoad = true; // vào từ màn hình đầu: bắt đầu ở nhà, rồi mới ra đường tới trường
     if (!p.setupDone) return renderSetup();
-    enterRoad();
+    enterHome();
   }
 
   /* ---------------- Tạo/sửa nhân vật: tên, ngoại hình, thú đồng hành ----------------
@@ -208,7 +208,9 @@
         p.look = draft.look; p.pet = draft.pet; p.setupDone = true;
         if (create) { S.addProfile(p); app.selected = p.id; }
         S.save();
-        if (app.viaRoad) enterRoad(); else enterSchool();
+        if (app.viaRoad) enterHome();
+        else if (app.scene === 'home' || app.scene === 'road') { show('school'); renderHud(); renderQuickbar(); buildWorld(null, true); } // đổi trang phục xong thì về lại chỗ đang đứng
+        else enterSchool();
       }, { id: 'btn-setup-done' })
     ]));
     wrap.appendChild(preview); wrap.appendChild(form);
@@ -223,6 +225,18 @@
   }
 
   /* Sang đường đúng luật (chờ đèn xanh, đi trên vạch): lần đầu mỗi ngày được thưởng một ngôi sao */
+  /* Giúp ông bà một việc nhà: lần đầu mỗi ngày được thưởng một ngôi sao */
+  function chore(key, sfx, done, again) {
+    var p = S.profile(), day = S.today(p);
+    day.chores = day.chores || {};
+    TT.audio.play(sfx);
+    if (day.chores[key]) return U.toast(again);
+    day.chores[key] = true; p.stars += 1; S.save();
+    setTimeout(function () { TT.audio.play('reward'); }, 500);
+    renderHud();
+    U.toast(done + ' Thưởng 1 ngôi sao!', 4200);
+  }
+
   function worldEvent(name) {
     if (name !== 'crossed') return;
     var p = S.profile(), day = S.today(p);
@@ -231,6 +245,19 @@
     TT.audio.play('reward');
     renderHud();
     U.toast('Con chờ đèn xanh và đi trên vạch kẻ đường: thưởng 1 ngôi sao!', 4200);
+  }
+
+  /* Mỗi lượt chơi bắt đầu ở nhà: bé chào ông bà, bố mẹ rồi ra cổng nhà đi học */
+  function enterHome() {
+    var p = S.profile();
+    S.rollClassmates(p);
+    p.lastPlayed = Date.now(); S.save();
+    applyProfileSettings();
+    app.scene = 'home'; app.sessionMs = 0;
+    show('school');
+    renderHud(); renderQuickbar();
+    buildWorld({ x: 1950, y: 850 }); // giữa sân gạch, trước hiên nhà
+    setTimeout(function () { if (app.scene === 'home') TT.world.greet('Mình chào ông bà, bố mẹ rồi ra cổng nhà đi học nhé!'); }, 600);
   }
 
   /* Đường tới trường: bé đi từ nhà, qua làng quê, chờ đèn xanh sang đường rồi mới vào cổng trường */
@@ -334,7 +361,15 @@
   function quickEntries() {
     var p = S.profile(), list = [];
     function add(id, icon, name, fn) { list.push({ id: id, icon: icon, name: name, fn: fn }); }
+    if (app.scene === 'home') {
+      TT.world.HOME_ZONES.forEach(function (z) { add(z.id, z.icon, z.name, function () { TT.world.goZone(z.id); }); });
+      add('rd-gate', 'classroom', 'Vào trường', function () { openZone('rd-gate'); }); // lối tắt cho bé đang vội
+      add('sos', 'sos', 'Số khẩn cấp', emergencyBoard);
+      add('guide', 'hint', 'Hướng dẫn chơi', guide);
+      return list;
+    }
     if (app.scene === 'road') {
+      add('rd-home', 'home', 'Về nhà', function () { openZone('rd-home'); });
       add('rd-gate', 'classroom', 'Vào trường', function () { openZone('rd-gate'); });
       add('traffic', 'walk', 'An toàn giao thông', function () { startSubject('life', 'giaothong'); });
       add('guide', 'hint', 'Hướng dẫn chơi', guide);
@@ -351,6 +386,7 @@
     }
     add('review', 'review', 'Ôn lại', function () { startMission('review'); });
     add('tour', 'map', 'Tham quan trường', startTour);
+    if (app.scene === 'yard') add('rd-home', 'home', 'Về nhà', function () { openZone('rd-home'); });
     if (app.scene === 'classroom') add('cls-door', 'door', 'Ra sân', leaveRoom);
     add('guide', 'hint', 'Hướng dẫn chơi', guide);
     return list;
@@ -378,6 +414,22 @@
     if (n.id === 'tam') {
       actions.push({ label: 'Học ăn uống an toàn', fn: function () { startSubject('life', 'anuong'); } });
       if (p.settings.division) actions.push({ label: 'Chia phần bánh', cls: 'secondary', fn: function () { startMission('canteen'); } });
+    }
+    if (n.id === 'me') {
+      actions.push({ label: 'Học phòng cháy chữa cháy', fn: function () { startSubject('life', 'pccc'); } });
+      actions.push({ label: 'Khi có cháy, con nhớ', cls: 'secondary', fn: fireBoard });
+    }
+    if (n.id === 'bo') {
+      actions.push({ label: 'Học phòng tránh đuối nước', fn: function () { startSubject('life', 'duoinuoc'); } });
+      actions.push({ label: 'Mưa bão, sấm sét', cls: 'secondary', fn: function () { startSubject('life', 'thientai'); } });
+    }
+    if (n.id === 'ba') {
+      actions.push({ label: 'Học an toàn ở nhà', fn: function () { startSubject('life', 'antoannha'); } });
+      actions.push({ label: 'Vật nuôi trong nhà', cls: 'secondary', fn: function () { startSubject('life', 'vatnuoi'); } });
+    }
+    if (n.id === 'ong') {
+      actions.push({ label: 'Học về vườn nhà, đồng quê', fn: function () { startSubject('life', 'vuonnha'); } });
+      actions.push({ label: 'Gia đình em', cls: 'secondary', fn: function () { startSubject('life', 'giadinh'); } });
     }
     if (n.id === 'k1') actions.push({ label: 'Chuyền bóng', fn: function () { openZone('sports'); } });
     if (n.id === 'k0') actions.push({ label: 'Thu hoạch ở vườn', fn: function () { openZone('garden'); } });
@@ -427,6 +479,35 @@
       case 'tour': return startTour();
       case 'rd-gate': TT.audio.play('whoosh'); return fade(function () { enterSchool(); });
       case 'road': return changeScene('road', { x: 2250, y: 650 }, null, 'whoosh');
+      // ----- Nhà em -----
+      case 'rd-home': return changeScene('home', null, function () {
+        setTimeout(function () { if (app.scene === 'home') TT.world.greet('Con chào ông bà, bố mẹ! Con đi học về rồi ạ!'); }, 400);
+      }, 'whoosh');
+      case 'hm-gate': return changeScene('road', { x: 320, y: 975 }, function () {
+        setTimeout(function () { if (app.scene === 'road') TT.world.greet('Mình đi học thôi! Đi dọc vỉa hè tới vạch sang đường nhé.'); }, 400);
+      }, 'whoosh');
+      case 'hm-bep': return choiceMenu('Gian bếp', [
+        { id: 'pccc', em: '🔥', name: 'Phòng cháy chữa cháy', note: 'cùng mẹ học cách phòng cháy', fn: function () { startSubject('life', 'pccc'); } },
+        { id: 'fire', em: '🚒', name: 'Khi có cháy, con nhớ', note: '6 điều để thoát hiểm', fn: fireBoard },
+        { id: 'sos', em: '📞', name: 'Số khẩn cấp', note: '111, 113, 114, 115', fn: emergencyBoard }
+      ]);
+      case 'hm-hien': return choiceMenu('Hiên nhà', [
+        { id: 'antoannha', em: '🏠', name: 'An toàn ở nhà', note: 'điện, vật sắc nhọn, người lạ', fn: function () { startSubject('life', 'antoannha'); } },
+        { id: 'giadinh', em: '👨‍👩‍👧', name: 'Gia đình em', note: 'lễ phép, yêu thương, giúp việc nhà', fn: function () { startSubject('life', 'giadinh'); } }
+      ]);
+      case 'hm-vuon': return choiceMenu('Vườn rau', [
+        { id: 'vuonnha', em: '🥬', name: 'Vườn nhà, đồng quê', note: 'cây trồng, mùa màng cùng ông', fn: function () { startSubject('life', 'vuonnha'); } },
+        { id: 'water', em: '💧', name: 'Tưới rau giúp ông', note: 'việc nhà vừa sức', fn: function () { chore('water', 'splash', 'Con tưới rau giúp ông, luống rau xanh mướt.', 'Hôm nay con tưới rau rồi. Tưới nhiều quá rau sẽ úng đấy!'); } }
+      ]);
+      case 'hm-chuong': return choiceMenu('Chuồng trại', [
+        { id: 'vatnuoi', em: '🐔', name: 'Vật nuôi trong nhà', note: 'gia cầm, gia súc và cách chăm sóc', fn: function () { startSubject('life', 'vatnuoi'); } },
+        { id: 'feed', em: '🌾', name: 'Cho gà vịt ăn', note: 'việc nhà vừa sức', fn: function () { chore('feed', 'cluck', 'Con cho gà vịt ăn giúp bà. Xong rồi nhớ rửa tay bằng xà phòng nhé!', 'Gà vịt hôm nay no rồi. Con nhớ rửa tay bằng xà phòng nhé!'); } }
+      ]);
+      case 'hm-ao': return startSubject('life', 'duoinuoc');
+      case 'hm-song': return choiceMenu('Bờ sông', [
+        { id: 'duoinuoc', em: '🛟', name: 'Phòng tránh đuối nước', note: 'cùng bố học an toàn bên sông nước', fn: function () { startSubject('life', 'duoinuoc'); } },
+        { id: 'thientai', em: '⛈️', name: 'Mưa bão, sấm sét', note: 'làm gì khi có giông, bão, lũ', fn: function () { startSubject('life', 'thientai'); } }
+      ]);
       case 'studio': return openAct('Tô màu nhân vật', function (body) {
         TT.act.studio(body, { onChange: function () { refreshCounters(); TT.world.destroy(); }, onDone: closeAct });
       }, 'yard');
@@ -563,9 +644,40 @@
     U.modal(h('div', { class: 'five' }, [board, row]), { cls: 'wide' });
   }
 
-  /* Hai bảng chọn nhỏ: Phòng Mỹ thuật và Nhà ăn */
+  /* Bảng "Khi có cháy, con nhớ" treo ở gian bếp */
+  function fireBoard() {
+    var lines = ['Hô to “Cháy! Cháy!” để mọi người cùng biết', 'Chạy ngay ra chỗ an toàn, không quay lại lấy đồ', 'Qua chỗ có khói: cúi thấp, che mũi miệng bằng khăn ướt',
+      'Đi cầu thang bộ, không đi thang máy', 'Không trốn trong tủ hay gầm giường', 'Ra tới nơi an toàn thì gọi 114'];
+    var ol = h('ol', { class: 'five-list' });
+    lines.forEach(function (t, i) { ol.appendChild(h('li', {}, [h('span', { class: 'five-n', text: String(i + 1) }), h('span', { text: t })])); });
+    var board = h('div', { class: 'five-board fire' }, [
+      h('div', { class: 'five-star', 'aria-hidden': 'true', html: A.icon('fire') }),
+      h('h2', { text: 'Khi có cháy, con nhớ' }),
+      h('p', { class: 'five-sub', text: 'quần áo bắt lửa thì dừng lại, nằm xuống và lăn' }),
+      ol
+    ]);
+    var row = h('div', { class: 'row-actions' });
+    if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak('Khi có cháy, con nhớ. ' + lines.map(function (t, i) { return 'Điều ' + (i + 1) + '. ' + t; }).join('. ') + '. Quần áo bắt lửa thì dừng lại, nằm xuống và lăn.'); }));
+    row.appendChild(btn('Đố vui phòng cháy', 'secondary', function () { U.closeModal(); startSubject('life', 'pccc'); }));
+    row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
+    U.modal(h('div', { class: 'five' }, [board, row]), { cls: 'wide' });
+  }
+  /* Bảng số điện thoại khẩn cấp */
+  function emergencyBoard() {
+    var nums = [['114', 'Cứu hoả, cứu nạn cứu hộ', 'khi có cháy, có người mắc kẹt'], ['115', 'Cấp cứu y tế', 'khi có người bị thương, ốm nặng'],
+      ['113', 'Công an', 'khi gặp kẻ xấu, trộm cướp, đánh nhau'], ['111', 'Tổng đài bảo vệ trẻ em', 'khi trẻ em bị bắt nạt, bị làm hại, cần giúp đỡ']];
+    var ul = h('ul', { class: 'sos-list' });
+    nums.forEach(function (n) { ul.appendChild(h('li', {}, [h('b', { class: 'sos-n', text: n[0] }), h('span', { class: 'sos-t' }, [h('b', { text: n[1] }), h('small', { text: n[2] })])])); });
+    var note = 'Gọi các số này không mất tiền. Khi gọi, con nói rõ: con tên gì, chuyện gì đang xảy ra, ở đâu. Không gọi để trêu đùa.';
+    var row = h('div', { class: 'row-actions' });
+    if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak('Số điện thoại khẩn cấp. ' + nums.map(function (n) { return n[0].split('').join(' ') + ': ' + n[1] + ', ' + n[2]; }).join('. ') + '. ' + note); }));
+    row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
+    U.modal(h('div', { class: 'home-box sos-box' }, [h('h2', { text: 'Số điện thoại khẩn cấp' }), ul, h('p', { class: 'sos-note', text: note }), row]), { cls: 'wide' });
+  }
+
+  /* Các bảng chọn nhỏ: Phòng Mỹ thuật, Nhà ăn và các góc ở nhà */
   function choiceMenu(title, cards) {
-    var grid = h('div', { class: 'subj-grid two' });
+    var grid = h('div', { class: 'subj-grid' + (cards.length === 2 ? ' two' : '') });
     cards.forEach(function (c) {
       grid.appendChild(btn(h('span', {}, [h('span', { class: 'em', text: c.em }), h('b', { text: c.name }), h('small', { text: c.note })]), 'subj-card', function () { U.closeModal(); c.fn(); }, { 'data-pick': c.id }));
     });
@@ -599,7 +711,9 @@
       var tell = function () {
         if (shown || app.scene !== 'yard' || app.screen !== 'school') return;
         shown = true;
-        U.say(T.GUIDE.name, A.adultSVG(T.GUIDE.art), s.text, [{ label: i < T.STOPS.length - 1 ? 'Đi tiếp' : 'Kể về quê hương em', fn: next }]);
+        var last = i >= T.STOPS.length - 1, home = T.SCHOOL.length || !S.schoolCustom();
+        U.say(T.GUIDE.name, A.adultSVG(T.GUIDE.art), s.text.split(S.DEFAULT_SCHOOL).join(S.schoolName()),
+          [{ label: !last ? 'Đi tiếp' : (home ? 'Kể về trường em, quê em' : 'Kết thúc chuyến tham quan'), fn: last && !home ? U.closeModal : next }]);
       };
       U.toast('Tham quan trường · điểm ' + (i + 1) + '/' + T.STOPS.length + ': ' + s.title, 2600);
       TT.world.walkTo(s.x, s.y, tell);
@@ -609,12 +723,12 @@
   }
   /* Phần cuối chuyến tham quan: quê hương em và thông tin về trường (nếu ba mẹ đã bổ sung trong tour.js) */
   function hometown() {
-    var T = TT.tour, lines = T.SCHOOL.concat(T.HOME);
+    var T = TT.tour, custom = S.schoolCustom(), lines = T.SCHOOL.concat(custom ? [] : T.HOME);
     var ul = h('ul', { class: 'home-list' });
     lines.forEach(function (t) { ul.appendChild(h('li', { text: t })); });
     var row = h('div', { class: 'row-actions wrap' });
     if (TT.audio.canSpeak()) row.appendChild(btn(h('span', { html: A.icon('speak') + ' Nghe đọc' }), 'ghost', function () { TT.audio.speak(lines.join(' ')); }));
-    row.appendChild(btn('Đố vui về trường em', 'secondary', function () { U.closeModal(); startSubject('life', 'truongem'); }, { id: 'btn-tour-quiz' }));
+    if (!custom) row.appendChild(btn('Đố vui về trường em', 'secondary', function () { U.closeModal(); startSubject('life', 'truongem'); }, { id: 'btn-tour-quiz' }));
     row.appendChild(btn('Con nhớ rồi', 'primary big', U.closeModal));
     U.modal(h('div', { class: 'home-box' }, [h('h2', { text: 'Trường em, quê em' }), ul, row]), { cls: 'wide' });
   }
@@ -861,7 +975,7 @@
     }
   };
 
-  app.subjectMenu = subjectMenu; app.startSubject = startSubject; app.guide = guide; app.enterRoad = enterRoad; app.startTour = startTour;
+  app.subjectMenu = subjectMenu; app.startSubject = startSubject; app.guide = guide; app.enterRoad = enterRoad; app.enterHome = enterHome; app.startTour = startTour;
   app.openZone = openZone; app.startMission = startMission; app.enterAs = enterAs; app.toggleFullscreen = toggleFullscreen;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(window);
